@@ -1,11 +1,11 @@
-import { Effect, Exit, Fiber } from "effect"
+import { Effect, type Exit, type Fiber } from "effect"
 
 /**
  * TODO: Run a simple synchronous Effect and return its result
  */
 export const runSimpleEffect = (effect: Effect.Effect<number>): number => {
 	// Your code here
-	return 0 // Replace with correct implementation
+	return Effect.runSync(effect)
 }
 
 /**
@@ -15,7 +15,7 @@ export const runEffectWithExit = <A, E>(
 	effect: Effect.Effect<A, E>,
 ): Exit.Exit<A, E> => {
 	// Your code here
-	return Exit.succeed(undefined as A) // Replace with correct implementation
+	return Effect.runSyncExit(effect) // Replace with correct implementation
 }
 
 /**
@@ -25,7 +25,7 @@ export const runAsyncEffect = async <A>(
 	effect: Effect.Effect<A>,
 ): Promise<A> => {
 	// Your code here
-	return undefined as A // Replace with correct implementation
+	return Effect.runPromise(effect) // Replace with correct implementation
 }
 
 /**
@@ -35,5 +35,5 @@ export const runEffectInBackground = <A, E>(
 	effect: Effect.Effect<A, E>,
 ): Fiber.RuntimeFiber<A, E> => {
 	// Your code here
-	return undefined as Fiber.RuntimeFiber<A, E> // Replace with correct implementation
+	return Effect.runFork(effect) // Replace with correct implementation
 }
