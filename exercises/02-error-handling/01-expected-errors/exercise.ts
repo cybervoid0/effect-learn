@@ -1,11 +1,11 @@
-import { Data, Effect } from "effect"
+import { Data, Effect, Schema } from "effect"
 
 /**
  * TODO: Create an Effect that fails with a simple string error "Not implemented"
  */
 export const createSimpleError = (): Effect.Effect<never, string> => {
 	// Your code here
-	return Effect.fail("") // Replace with correct implementation
+	return Effect.fail("Not implemented") // Replace with correct implementation
 }
 
 /**
@@ -14,17 +14,17 @@ export const createSimpleError = (): Effect.Effect<never, string> => {
  */
 export class DivisionByZeroError extends Data.TaggedError(
 	"DivisionByZeroError",
-)<{}> {}
+) {}
 
 /**
  * TODO: Parse a string to a number
  * Return Effect.fail with "Invalid number" if the string is not a valid number
  */
-export const parseNumber = (
-	input: string,
-): Effect.Effect<number, string> => {
-	// Your code here
-	return Effect.succeed(0) // Replace with correct implementation
+export const parseNumber = (input: string): Effect.Effect<number, string> => {
+	const schema = Schema.String.pipe(Schema.parseNumber)
+	return Schema.decodeUnknown(schema)(input).pipe(
+		Effect.mapError(() => "Invalid number"),
+	)
 }
 
 /**
@@ -36,7 +36,9 @@ export const divideWithError = (
 	b: number,
 ): Effect.Effect<number, DivisionByZeroError> => {
 	// Your code here
-	return Effect.succeed(0) // Replace with correct implementation
+	return b === 0
+		? Effect.fail(new DivisionByZeroError())
+		: Effect.succeed(a / b) // Replace with correct implementation
 }
 
 /**
@@ -55,5 +57,14 @@ export const validateAge = (
 	age: number,
 ): Effect.Effect<number, InvalidAgeError> => {
 	// Your code here
-	return Effect.succeed(0) // Replace with correct implementation
+	return Effect.succeed(age).pipe(
+		Effect.filterOrFail(
+			(a) => a >= 0 && a <= 120,
+			(a) =>
+				new InvalidAgeError({
+					age: a,
+					reason: "Invalid age",
+				}),
+		),
+	)
 }
