@@ -1,4 +1,4 @@
-import { Effect, pipe } from "effect"
+import { Effect } from "effect"
 
 /**
  * TODO: Double the value of an Effect
