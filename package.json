@@ -1,0 +1,46 @@
+{
+  "name": "@template/cli",
+  "version": "0.0.0",
+  "type": "module",
+  "packageManager": "pnpm@10.14.0",
+  "license": "MIT",
+  "description": "A basic Effect CLI application",
+  "repository": {
+    "type": "git",
+    "url": "<PLACEHOLDER>"
+  },
+  "publishConfig": {
+    "access": "public",
+    "directory": "dist"
+  },
+  "scripts": {
+    "build": "tsup && pnpm copy-package-json",
+    "build:ts": "tsup",
+    "clean": "rimraf dist/*",
+    "check": "tsc -b tsconfig.json",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:exercise": "vitest run",
+    "coverage": "vitest run --coverage",
+    "copy-package-json": "tsx scripts/copy-package-json.ts",
+    "exercise": "tsx scripts/exercise-cli.ts",
+    "generate:exercises": "tsx scripts/generate-exercises.ts"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "2.3.13",
+    "@effect/cli": "^0.69.0",
+    "@effect/language-service": "latest",
+    "@effect/platform": "^0.90.3",
+    "@effect/platform-node": "^0.96.0",
+    "@effect/vitest": "^0.25.1",
+    "@types/node": "^22.5.2",
+    "effect": "^3.17.7",
+    "tsup": "^8.2.4",
+    "tsx": "^4.19.1",
+    "typescript": "^5.6.2",
+    "vitest": "^3.2.0"
+  },
+  "pnpm": {
+    "patchedDependencies": {}
+  }
+}
