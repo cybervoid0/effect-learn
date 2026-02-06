@@ -1,11 +1,11 @@
-import { Effect } from "effect"
+import { DateTime, Effect, Random } from "effect"
 
 /**
  * TODO: Create an Effect that succeeds with the number 42
  */
 export const createSuccessEffect = (): Effect.Effect<number> => {
 	// Your code here
-	return Effect.succeed(0) // Replace with correct implementation
+	return Effect.succeed(42) // Replace with correct implementation
 }
 
 /**
@@ -13,7 +13,7 @@ export const createSuccessEffect = (): Effect.Effect<number> => {
  */
 export const createFailureEffect = (): Effect.Effect<never, string> => {
 	// Your code here
-	return Effect.fail("") // Replace with correct implementation
+	return Effect.fail("Something went wrong") // Replace with correct implementation
 }
 
 /**
@@ -21,7 +21,8 @@ export const createFailureEffect = (): Effect.Effect<never, string> => {
  */
 export const createRandomEffect = (): Effect.Effect<number> => {
 	// Your code here
-	return Effect.succeed(0) // Replace with correct implementation
+	// Replace with correct implementation
+	return Random.nextRange(0, 100)
 }
 
 /**
@@ -29,7 +30,8 @@ export const createRandomEffect = (): Effect.Effect<number> => {
  */
 export const createDateEffect = (): Effect.Effect<string> => {
 	// Your code here
-	return Effect.succeed("") // Replace with correct implementation
+	const date = DateTime.unsafeMake(new Date())
+	return Effect.succeed(DateTime.formatIso(date))
 }
 
 /**
@@ -41,5 +43,5 @@ export const createDivisionEffect = (
 	b: number,
 ): Effect.Effect<number, string> => {
 	// Your code here
-	return Effect.succeed(0) // Replace with correct implementation
+	return b === 0 ? Effect.fail("Division by zero") : Effect.succeed(a / b)
 }
