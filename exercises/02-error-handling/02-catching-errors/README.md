@@ -1,20 +1,20 @@
 # Catching Errors
 
-## Концепция
+## Concept
 
-Effect предоставляет мощные операторы для обработки ошибок. В отличие от try-catch, обработка ошибок в Effect **типобезопасна** и **композируема**.
+Effect provides powerful operators for error handling. Unlike try-catch, error handling in Effect is **type-safe** and **composable**.
 
 ### `catchAll`
-Ловит все ошибки и восстанавливается:
+Catches all errors and recovers:
 ```typescript
 const program = Effect.fail("error").pipe(
   Effect.catchAll(error => Effect.succeed("recovered"))
 )
-// Effect<string, never> - ошибка обработана!
+// Effect<string, never> - error handled!
 ```
 
 ### `catchTag`
-Ловит ошибки по тегу (для tagged errors):
+Catches errors by tag (for tagged errors):
 ```typescript
 class NetworkError extends Data.TaggedError("NetworkError")<{}> {}
 class ValidationError extends Data.TaggedError("ValidationError")<{}> {}
@@ -22,11 +22,11 @@ class ValidationError extends Data.TaggedError("ValidationError")<{}> {}
 const program = riskyOperation.pipe(
   Effect.catchTag("NetworkError", () => Effect.succeed("network fallback"))
 )
-// Обрабатывает только NetworkError, ValidationError остаётся
+// Handles only NetworkError, ValidationError remains
 ```
 
 ### `catchSome`
-Условная обработка ошибок:
+Conditional error handling:
 ```typescript
 const program = Effect.fail("error").pipe(
   Effect.catchSome(error => 
@@ -38,7 +38,7 @@ const program = Effect.fail("error").pipe(
 ```
 
 ### `match`
-Pattern matching на Success/Failure:
+Pattern matching on Success/Failure:
 ```typescript
 const result = program.pipe(
   Effect.match({
@@ -46,11 +46,11 @@ const result = program.pipe(
     onSuccess: value => `Success: ${value}`
   })
 )
-// Effect<string, never> - всегда успех!
+// Effect<string, never> - always succeeds!
 ```
 
 ### `matchEffect`
-Pattern matching с Effect в обоих случаях:
+Pattern matching with Effect in both cases:
 ```typescript
 const result = program.pipe(
   Effect.matchEffect({
@@ -60,17 +60,17 @@ const result = program.pipe(
 )
 ```
 
-## Задание
+## Assignment
 
-Реализуйте следующие функции в файле `exercise.ts`:
+Implement the following functions in `exercise.ts`:
 
-1. **recoverFromError** - поймать любую ошибку и вернуть fallback значение
-2. **recoverFromSpecificError** - поймать только NetworkError
-3. **retryOnRetryableError** - условно обработать "retryable" ошибки
-4. **matchResult** - использовать match для преобразования Success/Failure в строку
-5. **chainWithErrorHandling** - цепочка операций с обработкой ошибок на каждом шаге
+1. **recoverFromError** - catch any error and return a fallback value
+2. **recoverFromSpecificError** - catch only NetworkError
+3. **retryOnRetryableError** - conditionally handle "retryable" errors
+4. **matchResult** - use match to transform Success/Failure into a string
+5. **chainWithErrorHandling** - chain operations with error handling at each step
 
-## Примеры
+## Examples
 
 ```typescript
 import { Effect, Data, Option } from "effect"
@@ -79,19 +79,19 @@ class NetworkError extends Data.TaggedError("NetworkError")<{
   readonly message: string
 }> {}
 
-// catchAll - ловит все ошибки
+// catchAll - catches all errors
 const safe = Effect.fail("oops").pipe(
   Effect.catchAll(() => Effect.succeed("recovered"))
 )
 
-// catchTag - ловит по тегу
+// catchTag - catches by tag
 const program = Effect.fail(new NetworkError({ message: "timeout" })).pipe(
   Effect.catchTag("NetworkError", (error) => 
     Effect.succeed(`Recovered from: ${error.message}`)
   )
 )
 
-// catchSome - условная обработка
+// catchSome - conditional handling
 const conditional = Effect.fail("error").pipe(
   Effect.catchSome(error => {
     if (error.startsWith("retry")) {
@@ -109,7 +109,7 @@ const matched = Effect.succeed(42).pipe(
   })
 )
 
-// Цепочка с обработкой
+// Chain with error handling
 const chain = Effect.succeed(10).pipe(
   Effect.flatMap(n => 
     n > 5 
@@ -120,19 +120,19 @@ const chain = Effect.succeed(10).pipe(
 )
 ```
 
-## Подсказки
+## Hints
 
-- `catchAll` принимает функцию `(error) => Effect`
-- `catchTag` работает только с tagged errors
-- `catchSome` возвращает `Option<Effect>` - используй `Option.some` и `Option.none`
-- `match` всегда возвращает успешный Effect
-- Можно комбинировать несколько `catchTag` для разных ошибок
-- `Effect.gen` удобен для сложных цепочек с try-catch стилем
+- `catchAll` accepts a function `(error) => Effect`
+- `catchTag` only works with tagged errors
+- `catchSome` returns `Option<Effect>` - use `Option.some` and `Option.none`
+- `match` always returns a successful Effect
+- You can combine multiple `catchTag` for different errors
+- `Effect.gen` is convenient for complex chains with try-catch style
 
-## Бонус
+## Bonus
 
-Попробуйте:
-- Использовать `catchTags` для обработки нескольких типов ошибок
-- Создать retry логику с `catchAll` + рекурсия
-- Использовать `Effect.gen` с try-catch стилем обработки
-- Создать middleware паттерн для централизованной обработки ошибок
+Try to:
+- Use `catchTags` to handle multiple error types
+- Create retry logic with `catchAll` + recursion
+- Use `Effect.gen` with try-catch style handling
+- Create a middleware pattern for centralized error handling

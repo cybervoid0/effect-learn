@@ -1,11 +1,11 @@
 # Combining Effects
 
-## Концепция
+## Concept
 
-Effect предоставляет мощные операторы для комбинирования нескольких эффектов.
+Effect provides powerful operators for combining multiple effects.
 
 ### `Effect.zip`
-Комбинирует два Effect в tuple:
+Combines two Effects into a tuple:
 ```typescript
 const a = Effect.succeed(1)
 const b = Effect.succeed("hello")
@@ -15,7 +15,7 @@ const combined = Effect.zip(a, b)
 ```
 
 ### `Effect.zipWith`
-Комбинирует два Effect с функцией:
+Combines two Effects with a function:
 ```typescript
 const sum = Effect.zipWith(
   Effect.succeed(2),
@@ -26,9 +26,9 @@ const sum = Effect.zipWith(
 ```
 
 ### `Effect.all`
-Комбинирует массив или объект Effects:
+Combines array or object of Effects:
 ```typescript
-// Массив
+// Array
 const array = Effect.all([
   Effect.succeed(1),
   Effect.succeed(2),
@@ -36,7 +36,7 @@ const array = Effect.all([
 ])
 // Effect<[number, number, number]>
 
-// Объект
+// Object
 const object = Effect.all({
   name: Effect.succeed("John"),
   age: Effect.succeed(25)
@@ -45,7 +45,7 @@ const object = Effect.all({
 ```
 
 ### `Effect.struct`
-Алиас для `Effect.all` с объектом:
+Alias for `Effect.all` with object:
 ```typescript
 const user = Effect.struct({
   id: Effect.succeed(1),
@@ -56,7 +56,7 @@ const user = Effect.struct({
 ```
 
 ### `Effect.tuple`
-Алиас для `Effect.all` с массивом:
+Alias for `Effect.all` with array:
 ```typescript
 const data = Effect.tuple(
   Effect.succeed(1),
@@ -66,47 +66,47 @@ const data = Effect.tuple(
 // Effect<[number, string, boolean]>
 ```
 
-### Опции комбинирования
+### Combining Options
 ```typescript
-// Последовательное выполнение
+// Sequential execution
 Effect.all(effects, { concurrency: 1 })
 
-// Параллельное выполнение
+// Parallel execution
 Effect.all(effects, { concurrency: "unbounded" })
 
-// Ограниченная параллельность
+// Limited concurrency
 Effect.all(effects, { concurrency: 5 })
 
-// Fail fast (остановиться на первой ошибке)
+// Fail fast (stop on first error)
 Effect.all(effects, { mode: "default" })
 
-// Собрать все ошибки
+// Collect all errors
 Effect.all(effects, { mode: "validate" })
 ```
 
-## Задание
+## Assignment
 
-Реализуйте следующие функции в файле `exercise.ts`:
+Implement the following functions in `exercise.ts`:
 
-1. **zipTwo** - объединить два Effect в tuple используя zip
-2. **zipWithSum** - объединить два числа и сложить их используя zipWith
-3. **combineArray** - объединить массив Effects используя all
-4. **combineObject** - объединить объект Effects используя struct
-5. **parallelFetch** - симулировать параллельные запросы с ограничением concurrency
+1. **zipTwo** - combine two Effects into a tuple using zip
+2. **zipWithSum** - combine two numbers and sum them using zipWith
+3. **combineArray** - combine array of Effects using all
+4. **combineObject** - combine object of Effects using struct
+5. **parallelFetch** - simulate parallel requests with concurrency limit
 
-## Примеры
+## Examples
 
 ```typescript
 import { Effect } from "effect"
 
-// zip - простое комбинирование
+// zip - simple combining
 const pair = Effect.zip(
   Effect.succeed(42),
   Effect.succeed("answer")
 )
 // [42, "answer"]
 
-// zipWith - с трансформацией
+// zipWith - with transformation
 const sum = Effect.zipWith(
   Effect.succeed(10),
   Effect.succeed(32),
@@ -114,7 +114,7 @@ const sum = Effect.zipWith(
 )
 // 42
 
-// all с массивом
+// all with array
 const numbers = Effect.all([
   Effect.succeed(1),
   Effect.succeed(2),
@@ -122,7 +122,7 @@ const numbers = Effect.all([
 ])
 // [1, 2, 3]
 
-// all с объектом (или struct)
+// all with object (or struct)
 const user = Effect.all({
   id: Effect.succeed(1),
   name: Effect.succeed("John"),
@@ -130,47 +130,47 @@ const user = Effect.all({
 })
 // { id: 1, name: "John", verified: true }
 
-// tuple - альтернативный синтаксис
+// tuple - alternative syntax
 const data = Effect.tuple(
   Effect.succeed(1),
   Effect.succeed("hello")
 )
 // [1, "hello"]
 
-// Параллельность
+// Parallelism
 const parallel = Effect.all(
   [task1, task2, task3],
   { concurrency: "unbounded" }
 )
 
-// Ограниченная параллельность
+// Limited concurrency
 const limited = Effect.all(
   [task1, task2, task3, task4, task5],
-  { concurrency: 2 } // максимум 2 одновременно
+  { concurrency: 2 } // maximum 2 at once
 )
 
-// Собрать все ошибки
+// Collect all errors
 const validated = Effect.all(
   [validation1, validation2, validation3],
   { mode: "validate" }
 )
 ```
 
-## Подсказки
+## Hints
 
-- `zip` для двух Effects
-- `zipWith` когда нужно сразу трансформировать результат
-- `all` для массивов и объектов
-- `struct` - более явный алиас для объектов
-- `tuple` - более явный алиас для массивов
-- `concurrency` опция контролирует параллельность
-- `mode: "validate"` собирает все ошибки вместо fail-fast
+- `zip` for two Effects
+- `zipWith` when you need to transform the result immediately
+- `all` for arrays and objects
+- `struct` - more explicit alias for objects
+- `tuple` - more explicit alias for arrays
+- `concurrency` option controls parallelism
+- `mode: "validate"` collects all errors instead of fail-fast
 
-## Бонус
+## Bonus
 
-Попробуйте:
-- Использовать `Effect.validate` для сбора всех ошибок валидации
-- Комбинировать `zip` с `map` для сложных трансформаций
-- Создать вложенные структуры с `all`
-- Использовать `Effect.forEach` + `Effect.all` для сложных паттернов
-- Измерить разницу во времени выполнения sequential vs parallel
+Try to:
+- Use `Effect.validate` to collect all validation errors
+- Combine `zip` with `map` for complex transformations
+- Create nested structures with `all`
+- Use `Effect.forEach` + `Effect.all` for complex patterns
+- Measure execution time difference sequential vs parallel

@@ -1,221 +1,221 @@
 # Effect Learning Guide
 
-Руководство по использованию учебных заданий Effect.
+A guide to using Effect learning exercises.
 
-## Структура проекта
+## Project Structure
 
 ```
 exercises/
-├── 01-basics/              # Базовые концепции
-├── 02-error-handling/      # Обработка ошибок
-├── 03-control-flow/        # Управление потоком
-├── 04-concurrency/         # Конкурентность
-├── 05-resource-management/ # Управление ресурсами
-├── 06-services/            # Сервисы и DI
-├── 07-state-management/    # Управление состоянием
-├── 08-advanced-concurrency/# Продвинутая конкурентность
-├── 09-streams/             # Потоки данных
-├── 10-sink/                # Sink для потоков
-├── 11-scheduling-caching/  # Планирование и кэширование
-├── 12-batching-requests/   # Батчинг запросов
-├── 13-observability/       # Наблюдаемость
-├── 14-configuration-runtime/# Конфигурация и Runtime
-└── 15-advanced-patterns/   # Продвинутые паттерны
+├── 01-basics/              # Basic concepts
+├── 02-error-handling/      # Error handling
+├── 03-control-flow/        # Control flow
+├── 04-concurrency/         # Concurrency
+├── 05-resource-management/ # Resource management
+├── 06-services/            # Services and DI
+├── 07-state-management/    # State management
+├── 08-advanced-concurrency/# Advanced concurrency
+├── 09-streams/             # Data streams
+├── 10-sink/                # Sinks for streams
+├── 11-scheduling-caching/  # Scheduling and caching
+├── 12-batching-requests/   # Request batching
+├── 13-observability/       # Observability
+├── 14-configuration-runtime/# Configuration and Runtime
+└── 15-advanced-patterns/   # Advanced patterns
 ```
 
-## Структура каждого задания
+## Exercise Structure
 
-Каждое задание содержит 4 файла:
+Each exercise contains 4 files:
 
 ### `README.md`
-Описание задания:
-- **Концепция** - объяснение изучаемой концепции
-- **Задание** - что нужно реализовать
-- **Примеры** - примеры использования
-- **Подсказки** - полезные ссылки и советы
-- **Бонус** - дополнительные челленджи
+Exercise description:
+- **Concept** - explanation of the concept being learned
+- **Assignment** - what needs to be implemented
+- **Examples** - usage examples
+- **Hints** - useful links and tips
+- **Bonus** - additional challenges
 
 ### `exercise.ts`
-Файл с заготовкой кода:
-- Типы и интерфейсы
-- TODO комментарии
-- Заглушки функций для реализации
+Code template:
+- Types and interfaces
+- TODO comments
+- Function stubs to implement
 
 ### `solution.ts`
-Эталонное решение:
-- Полная реализация
-- Комментарии к сложным местам
+Reference solution:
+- Complete implementation
+- Comments on complex parts
 - Best practices
 
 ### `exercise.test.ts`
-Автоматические тесты:
-- Проверка корректности решения
-- Использует `@effect/vitest`
-- Покрывает edge cases
+Automated tests:
+- Solution correctness checks
+- Uses `@effect/vitest`
+- Covers edge cases
 
-## Как работать с заданиями
+## How to Work with Exercises
 
-### 1. Выбор задания
+### 1. Choose an Exercise
 
-Начните с Level 1 и двигайтесь последовательно:
+Start with Level 1 and progress sequentially:
 
 ```bash
 cd exercises/01-basics/01-creating-effects
 ```
 
-### 2. Чтение задания
+### 2. Read the Exercise
 
-Откройте `README.md` и внимательно прочитайте:
-- Концепцию
-- Требования задания
-- Примеры
+Open `README.md` and carefully read:
+- The concept
+- Exercise requirements
+- Examples
 
-### 3. Реализация
+### 3. Implementation
 
-Откройте `exercise.ts` и реализуйте функции:
+Open `exercise.ts` and implement the functions:
 
 ```typescript
-// Найдите TODO комментарии
+// Find TODO comments
 export const createSuccessEffect = (): Effect.Effect<number> => {
   // TODO: Your code here
   return Effect.succeed(42)
 }
 ```
 
-### 4. Запуск тестов
+### 4. Run Tests
 
-Проверьте решение:
+Check your solution:
 
 ```bash
-# Из корня проекта
+# From project root
 npm run test exercises/01-basics/01-creating-effects
 
-# Или в watch mode
+# Or in watch mode
 npm run test -- --watch exercises/01-basics/01-creating-effects
 ```
 
-### 5. Сравнение с решением
+### 5. Compare with Solution
 
-Если застряли, посмотрите `solution.ts`:
+If stuck, check `solution.ts`:
 
 ```bash
 cat solution.ts
 ```
 
-### 6. Отметка прогресса
+### 6. Track Progress
 
-Отметьте выполненное задание в `EXERCISES.md`:
+Mark completed exercises in `EXERCISES.md`:
 
 ```markdown
 - [x] **01-creating-effects** - Creating Effects
 ```
 
-## Команды
+## Commands
 
-### Запуск тестов
+### Running Tests
 
 ```bash
-# Все тесты
+# All tests
 npm test
 
-# Конкретное задание
+# Specific exercise
 npm test exercises/01-basics/01-creating-effects
 
 # Watch mode
 npm test -- --watch
 
-# С coverage
+# With coverage
 npm run coverage
 ```
 
-### Проверка типов
+### Type Checking
 
 ```bash
 npm run check
 ```
 
-### Форматирование
+### Formatting
 
 ```bash
-# Проверка
+# Check
 npm run lint
 
-# Автофикс (если настроен)
+# Auto-fix (if configured)
 npm run format
 ```
 
-## Советы по изучению
+## Learning Tips
 
-### Для начинающих
+### For Beginners
 
-1. **Не спешите** - изучайте концепции последовательно
-2. **Экспериментируйте** - меняйте код и смотрите что происходит
-3. **Читайте ошибки** - TypeScript подскажет что не так
-4. **Используйте REPL** - попробуйте код в интерактивном режиме
+1. **Don't rush** - study concepts sequentially
+2. **Experiment** - change code and see what happens
+3. **Read errors** - TypeScript will tell you what's wrong
+4. **Use REPL** - try code interactively
 
-### Для продолжающих
+### For Intermediate
 
-1. **Изучайте типы** - обращайте внимание на типы в сигнатурах
-2. **Читайте исходники** - Effect open source, можно посмотреть реализацию
-3. **Решайте бонусы** - дополнительные челленджи для глубокого понимания
-4. **Пишите свои тесты** - добавьте edge cases
+1. **Study types** - pay attention to types in signatures
+2. **Read source code** - Effect is open source, you can check implementation
+3. **Solve bonuses** - additional challenges for deeper understanding
+4. **Write your own tests** - add edge cases
 
-### Для продвинутых
+### For Advanced
 
-1. **Оптимизируйте** - найдите более эффективные решения
-2. **Рефакторите** - улучшите читаемость и переиспользуемость
-3. **Создавайте абстракции** - обобщите паттерны
-4. **Делитесь знаниями** - помогайте другим в Discord
+1. **Optimize** - find more efficient solutions
+2. **Refactor** - improve readability and reusability
+3. **Create abstractions** - generalize patterns
+4. **Share knowledge** - help others in Discord
 
-## Частые проблемы
+## Common Issues
 
-### Тесты не проходят
+### Tests Don't Pass
 
-1. Проверьте типы - `npm run check`
-2. Прочитайте сообщение об ошибке
-3. Сравните с `solution.ts`
-4. Проверьте edge cases в тестах
+1. Check types - `npm run check`
+2. Read error message
+3. Compare with `solution.ts`
+4. Check edge cases in tests
 
-### Не понимаю концепцию
+### Don't Understand the Concept
 
-1. Перечитайте `README.md`
-2. Изучите примеры
-3. Почитайте [документацию Effect](https://effect.website/docs/)
-4. Задайте вопрос в [Discord](https://discord.gg/effect-ts)
+1. Re-read `README.md`
+2. Study examples
+3. Read [Effect documentation](https://effect.website/docs/)
+4. Ask in [Discord](https://discord.gg/effect-ts)
 
-### TypeScript ошибки
+### TypeScript Errors
 
-1. Проверьте импорты
-2. Убедитесь что используете правильные типы
-3. Посмотрите на сигнатуры функций в документации
-4. Используйте IDE подсказки (hover)
+1. Check imports
+2. Make sure you're using correct types
+3. Look at function signatures in documentation
+4. Use IDE hints (hover)
 
-## Дополнительные ресурсы
+## Additional Resources
 
-### Документация
+### Documentation
 
-- [Effect Documentation](https://effect.website/docs/) - официальная документация
-- [API Reference](https://effect-ts.github.io/effect/) - справочник API
-- [Effect Blog](https://effect.website/blog/) - статьи и туториалы
+- [Effect Documentation](https://effect.website/docs/) - official documentation
+- [API Reference](https://effect-ts.github.io/effect/) - API reference
+- [Effect Blog](https://effect.website/blog/) - articles and tutorials
 
-### Сообщество
+### Community
 
-- [Discord](https://discord.gg/effect-ts) - чат сообщества
-- [GitHub](https://github.com/Effect-TS/effect) - исходный код
-- [Twitter](https://twitter.com/EffectTS_) - новости
+- [Discord](https://discord.gg/effect-ts) - community chat
+- [GitHub](https://github.com/Effect-TS/effect) - source code
+- [Twitter](https://twitter.com/EffectTS_) - news
 
-### Видео
+### Videos
 
-- [Effect YouTube](https://youtube.com/@effect-ts) - официальный канал
-- [Effect Talks](https://effect.website/events/) - конференции и митапы
+- [Effect YouTube](https://youtube.com/@effect-ts) - official channel
+- [Effect Talks](https://effect.website/events/) - conferences and meetups
 
-## Следующие шаги
+## Next Steps
 
-После прохождения всех заданий:
+After completing all exercises:
 
-1. **Создайте свой проект** - примените знания на практике
-2. **Изучите экосистему** - `@effect/platform`, `@effect/schema`, `@effect/cli`
-3. **Внесите вклад** - помогите улучшить Effect
-4. **Поделитесь опытом** - напишите статью или сделайте доклад
+1. **Create your own project** - apply knowledge in practice
+2. **Explore the ecosystem** - `@effect/platform`, `@effect/schema`, `@effect/cli`
+3. **Contribute** - help improve Effect
+4. **Share experience** - write an article or give a talk
 
-Удачи в изучении Effect! 🚀
+Good luck learning Effect! 🚀

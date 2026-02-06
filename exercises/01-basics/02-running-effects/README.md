@@ -1,74 +1,74 @@
 # Running Effects
 
-## Концепция
+## Concept
 
-Effect - это **ленивое** описание вычисления. Чтобы получить результат, нужно **запустить** Effect используя один из методов:
+Effect is a **lazy** description of a computation. To get the result, you need to **run** the Effect using one of the methods:
 
 ### `Effect.runSync`
-Запускает Effect синхронно и возвращает результат. Бросает исключение если Effect падает или асинхронный.
+Runs an Effect synchronously and returns the result. Throws an exception if the Effect fails or is asynchronous.
 ```typescript
 const result = Effect.runSync(Effect.succeed(42))
 // result: 42
 ```
 
 ### `Effect.runPromise`
-Запускает Effect и возвращает Promise с результатом.
+Runs an Effect and returns a Promise with the result.
 ```typescript
 const result = await Effect.runPromise(Effect.succeed(42))
 // result: 42
 ```
 
 ### `Effect.runSyncExit`
-Запускает Effect синхронно и возвращает `Exit` - структуру данных, которая представляет результат (успех или ошибку).
+Runs an Effect synchronously and returns an `Exit` - a data structure representing the result (success or failure).
 ```typescript
 const exit = Effect.runSyncExit(Effect.succeed(42))
 // exit: Exit.Success<42>
 ```
 
 ### `Effect.runFork`
-Запускает Effect в фоновом Fiber и возвращает `RuntimeFiber`.
+Runs an Effect in a background Fiber and returns a `RuntimeFiber`.
 ```typescript
 const fiber = Effect.runFork(Effect.succeed(42))
 // fiber: RuntimeFiber<number, never>
 ```
 
-## Когда использовать какой метод?
+## When to Use Which Method?
 
-- **`runSync`** - когда Effect точно синхронный и не может упасть
-- **`runSyncExit`** - когда нужно обработать ошибки синхронного Effect
-- **`runPromise`** - когда Effect асинхронный или в async функциях
-- **`runFork`** - когда нужно запустить Effect в фоне и продолжить выполнение
+- **`runSync`** - when the Effect is definitely synchronous and can't fail
+- **`runSyncExit`** - when you need to handle errors from a synchronous Effect
+- **`runPromise`** - when the Effect is asynchronous or in async functions
+- **`runFork`** - when you need to run an Effect in the background and continue execution
 
-## Задание
+## Assignment
 
-Реализуйте следующие функции в файле `exercise.ts`:
+Implement the following functions in `exercise.ts`:
 
-1. `runSimpleEffect` - запустите синхронный Effect и верните результат
-2. `runEffectWithExit` - запустите Effect и верните Exit результат
-3. `runAsyncEffect` - запустите асинхронный Effect через Promise
-4. `runEffectInBackground` - запустите Effect в фоне и верните Fiber
+1. `runSimpleEffect` - run a synchronous Effect and return the result
+2. `runEffectWithExit` - run an Effect and return the Exit result
+3. `runAsyncEffect` - run an asynchronous Effect via Promise
+4. `runEffectInBackground` - run an Effect in the background and return the Fiber
 
-## Примеры
+## Examples
 
 ```typescript
 import { Effect } from "effect"
 
-// Синхронный запуск
+// Synchronous run
 const value = Effect.runSync(Effect.succeed(42))
 console.log(value) // 42
 
-// С обработкой Exit
+// With Exit handling
 const exit = Effect.runSyncExit(Effect.fail("error"))
 if (Exit.isFailure(exit)) {
   console.log("Failed!")
 }
 
-// Асинхронный запуск
+// Asynchronous run
 await Effect.runPromise(
   Effect.promise(() => fetch("https://api.example.com"))
 )
 
-// Фоновый запуск
+// Background run
 const fiber = Effect.runFork(
   Effect.gen(function* () {
     yield* Effect.sleep("1 second")
@@ -77,17 +77,17 @@ const fiber = Effect.runFork(
 )
 ```
 
-## Подсказки
+## Hints
 
-- `Effect.runSync` для простых синхронных Effect
-- `Effect.runSyncExit` когда нужен `Exit` результат
-- `Effect.runPromise` для асинхронных Effect
-- `Effect.runFork` для фоновых задач
-- Не забудьте про `await` с `runPromise`
+- Use `Effect.runSync` for simple synchronous Effects
+- Use `Effect.runSyncExit` when you need an `Exit` result
+- Use `Effect.runPromise` for asynchronous Effects
+- Use `Effect.runFork` for background tasks
+- Don't forget `await` with `runPromise`
 
-## Бонус
+## Bonus
 
-Попробуйте:
-- Запустить Effect с задержкой через `Effect.sleep`
-- Получить результат из Fiber используя `Fiber.await`
-- Обработать ошибку из Exit используя `Exit.match`
+Try to:
+- Run an Effect with a delay using `Effect.sleep`
+- Get the result from a Fiber using `Fiber.await`
+- Handle an error from Exit using `Exit.match`

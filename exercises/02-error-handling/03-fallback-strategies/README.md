@@ -1,45 +1,45 @@
 # Fallback Strategies
 
-## Концепция
+## Concept
 
-Effect предоставляет мощные стратегии для обработки ошибок через fallback, retry и timeout.
+Effect provides powerful strategies for error handling through fallback, retry, and timeout.
 
 ### `orElse`
-Пробует альтернативный Effect если первый падает:
+Tries an alternative Effect if the first one fails:
 ```typescript
 const primary = Effect.fail("primary failed")
 const fallback = Effect.succeed("fallback value")
 
 const result = primary.pipe(Effect.orElse(() => fallback))
-// Effect<string, never> - успех с fallback значением
+// Effect<string, never> - success with fallback value
 ```
 
 ### `retry`
-Повторяет Effect при ошибке:
+Retries an Effect on error:
 ```typescript
 import { Schedule } from "effect"
 
 const unstable = Effect.fail("temporary error")
 
 const withRetry = unstable.pipe(
-  Effect.retry(Schedule.recurs(3)) // попробует 3 раза
+  Effect.retry(Schedule.recurs(3)) // will try 3 times
 )
 ```
 
 ### `timeout`
-Устанавливает таймаут на операцию:
+Sets a timeout on an operation:
 ```typescript
 const slow = Effect.sleep("10 seconds").pipe(
   Effect.andThen(Effect.succeed("done"))
 )
 
 const withTimeout = slow.pipe(
-  Effect.timeout("2 seconds") // упадёт с TimeoutException через 2 секунды
+  Effect.timeout("2 seconds") // will fail with TimeoutException after 2 seconds
 )
 ```
 
 ### `timeoutTo`
-Timeout с fallback значением:
+Timeout with a fallback value:
 ```typescript
 const result = slow.pipe(
   Effect.timeoutTo({
@@ -49,8 +49,8 @@ const result = slow.pipe(
 )
 ```
 
-### Комбинирование стратегий
-Можно комбинировать несколько стратегий:
+### Combining Strategies
+You can combine multiple strategies:
 ```typescript
 const robust = riskyOperation.pipe(
   Effect.retry(Schedule.exponential("100 millis")),
@@ -59,17 +59,17 @@ const robust = riskyOperation.pipe(
 )
 ```
 
-## Задание
+## Assignment
 
-Реализуйте следующие функции в файле `exercise.ts`:
+Implement the following functions in `exercise.ts`:
 
-1. **withFallback** - попробовать primary, если падает - использовать fallback
-2. **retryThreeTimes** - повторить операцию до 3 раз при ошибке
-3. **withTimeout** - добавить timeout 1 секунду к операции
-4. **retryWithExponentialBackoff** - retry с экспоненциальной задержкой
-5. **robustOperation** - комбинация retry + timeout + fallback
+1. **withFallback** - try primary, if it fails - use fallback
+2. **retryThreeTimes** - retry operation up to 3 times on error
+3. **withTimeout** - add 1 second timeout to operation
+4. **retryWithExponentialBackoff** - retry with exponential backoff
+5. **robustOperation** - combination of retry + timeout + fallback
 
-## Примеры
+## Examples
 
 ```typescript
 import { Effect, Schedule } from "effect"
@@ -79,12 +79,12 @@ const withFallback = Effect.fail("error").pipe(
   Effect.orElse(() => Effect.succeed("fallback"))
 )
 
-// retry - простой
+// retry - simple
 const withRetry = unstableOperation.pipe(
   Effect.retry(Schedule.recurs(3))
 )
 
-// retry - с политикой
+// retry - with policy
 const withBackoff = unstableOperation.pipe(
   Effect.retry(
     Schedule.exponential("100 millis").pipe(
@@ -98,7 +98,7 @@ const withTimeout = slowOperation.pipe(
   Effect.timeout("5 seconds")
 )
 
-// timeoutTo - с fallback
+// timeoutTo - with fallback
 const withTimeoutFallback = slowOperation.pipe(
   Effect.timeoutTo({
     duration: "5 seconds",
@@ -106,7 +106,7 @@ const withTimeoutFallback = slowOperation.pipe(
   })
 )
 
-// Комбинация
+// Combination
 const robust = riskyOperation.pipe(
   Effect.retry(Schedule.recurs(3)),
   Effect.timeout("10 seconds"),
@@ -114,20 +114,20 @@ const robust = riskyOperation.pipe(
 )
 ```
 
-## Подсказки
+## Hints
 
-- `orElse` принимает функцию `() => Effect`
-- `retry` принимает `Schedule` - используй `Schedule.recurs(n)`
-- `timeout` принимает duration как строку: `"1 second"`, `"500 millis"`
-- `Schedule.exponential` для экспоненциального backoff
-- `Schedule.compose` для комбинирования schedules
-- Порядок важен: обычно retry → timeout → orElse
+- `orElse` accepts a function `() => Effect`
+- `retry` accepts a `Schedule` - use `Schedule.recurs(n)`
+- `timeout` accepts duration as a string: `"1 second"`, `"500 millis"`
+- `Schedule.exponential` for exponential backoff
+- `Schedule.compose` for combining schedules
+- Order matters: usually retry → timeout → orElse
 
-## Бонус
+## Bonus
 
-Попробуйте:
-- Создать custom Schedule с jitter
-- Использовать `retryOrElse` для обработки после всех retry
-- Добавить логирование каждой попытки retry
-- Реализовать circuit breaker паттерн
-- Использовать `Schedule.spaced` для fixed delay между retry
+Try to:
+- Create a custom Schedule with jitter
+- Use `retryOrElse` to handle after all retries
+- Add logging for each retry attempt
+- Implement a circuit breaker pattern
+- Use `Schedule.spaced` for fixed delay between retries

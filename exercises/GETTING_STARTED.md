@@ -1,84 +1,84 @@
 # Getting Started with Effect Learning Exercises
 
-Добро пожаловать в курс изучения Effect! 🎉
+Welcome to the Effect learning course! 🎉
 
-## Что создано
+## What's Created
 
-✅ **47 учебных заданий** разделенных на **15 уровней**
-✅ Полная структура директорий для всех заданий
-✅ Утилиты для тестирования (`test-utils.ts`)
-✅ CLI для управления заданиями
-✅ Документация и руководства
+✅ **47 learning exercises** divided into **15 levels**
+✅ Complete directory structure for all exercises
+✅ Testing utilities (`test-utils.ts`)
+✅ CLI for managing exercises
+✅ Documentation and guides
 
-## Структура проекта
+## Project Structure
 
 ```
 exercises/
-├── 01-basics/              ✅ Level 1 (3 задания) - ПОЛНОСТЬЮ ГОТОВ
+├── 01-basics/              ✅ Level 1 (3 exercises) - FULLY READY
 │   ├── 01-creating-effects/
 │   ├── 02-running-effects/
 │   └── 03-transforming-effects/
-├── 02-error-handling/      📝 Level 2 (3 задания) - базовая структура
-├── 03-control-flow/        📝 Level 3 (3 задания) - базовая структура
-├── 04-concurrency/         📝 Level 4 (3 задания) - базовая структура
-├── 05-resource-management/ 📝 Level 5 (2 задания) - базовая структура
-├── 06-services/            📝 Level 6 (3 задания) - базовая структура
-├── 07-state-management/    📝 Level 7 (3 задания) - базовая структура
-├── 08-advanced-concurrency/📝 Level 8 (4 задания) - базовая структура
-├── 09-streams/             📝 Level 9 (4 задания) - базовая структура
-├── 10-sink/                📝 Level 10 (2 задания) - базовая структура
-├── 11-scheduling-caching/  📝 Level 11 (3 задания) - базовая структура
-├── 12-batching-requests/   📝 Level 12 (2 задания) - базовая структура
-├── 13-observability/       📝 Level 13 (3 задания) - базовая структура
-├── 14-configuration-runtime/📝 Level 14 (3 задания) - базовая структура
-└── 15-advanced-patterns/   📝 Level 15 (3 задания) - базовая структура
+├── 02-error-handling/      ✅ Level 2 (3 exercises) - FULLY READY
+├── 03-control-flow/        ✅ Level 3 (3 exercises) - FULLY READY
+├── 04-concurrency/         📝 Level 4 (3 exercises) - basic structure
+├── 05-resource-management/ 📝 Level 5 (2 exercises) - basic structure
+├── 06-services/            📝 Level 6 (3 exercises) - basic structure
+├── 07-state-management/    📝 Level 7 (3 exercises) - basic structure
+├── 08-advanced-concurrency/📝 Level 8 (4 exercises) - basic structure
+├── 09-streams/             📝 Level 9 (4 exercises) - basic structure
+├── 10-sink/                📝 Level 10 (2 exercises) - basic structure
+├── 11-scheduling-caching/  📝 Level 11 (3 exercises) - basic structure
+├── 12-batching-requests/   📝 Level 12 (2 exercises) - basic structure
+├── 13-observability/       📝 Level 13 (3 exercises) - basic structure
+├── 14-configuration-runtime/📝 Level 14 (3 exercises) - basic structure
+└── 15-advanced-patterns/   📝 Level 15 (3 exercises) - basic structure
 ```
 
-## Быстрый старт
+## Quick Start
 
-### 1. Начните с Level 1
+### 1. Start with Level 1
 
-Level 1 (Basics) полностью готов с детальными описаниями, примерами и тестами:
+Level 1 (Basics) is fully ready with detailed descriptions, examples, and tests:
 
 ```bash
 cd exercises/01-basics/01-creating-effects
 cat README.md
 ```
 
-### 2. Реализуйте задание
+### 2. Implement the Exercise
 
-Откройте `exercise.ts` и реализуйте функции:
+Open `exercise.ts` and implement the functions:
 
 ```typescript
 export const createSuccessEffect = (): Effect.Effect<number> => {
   // TODO: Your code here
-  return Effect.succeed(42) // Замените на правильную реализацию
+  return Effect.succeed(42) // Replace with correct implementation
 }
 ```
 
-### 3. Запустите тесты
+### 3. Run Tests
 
 ```bash
 npm test exercises/01-basics/01-creating-effects
 ```
 
-### 4. Сравните с решением
+### 4. Compare with Solution
 
-Если застряли:
+If you're stuck:
 
 ```bash
 cat solution.ts
 ```
 
-## Доступные команды
+## Available Commands
 
-### Тестирование
+### Testing
 
 ```bash
-# Все тесты
+# All tests
 npm test
 
-# Конкретное задание
+# Specific exercise
 npm test exercises/01-basics/01-creating-effects
 
 # Watch mode
@@ -91,115 +91,125 @@ npm run coverage
 ### CLI
 
 ```bash
-# Список всех заданий
+# List all exercises
 npm run exercise list
 
-# Показать задание
+# Show exercise
 npm run exercise show 01-basics/01-creating-effects
 
-# Запустить тесты
+# Run tests
 npm run exercise test 01-basics/01-creating-effects
 
-# Показать решение
+# Show solution
 npm run exercise solution 01-basics/01-creating-effects
 
-# Проверить решение
+# Verify solution
 npm run exercise verify 01-basics/01-creating-effects
 ```
 
-### Проверка типов
+### Type Checking
 
 ```bash
 npm run check
 ```
 
-## Что дальше?
+## What's Next?
 
-### Для начинающих
+### For Beginners
 
-1. **Пройдите Level 1** - это даст вам базовое понимание Effect
-2. **Читайте документацию** - [Effect Docs](https://effect.website/docs/)
-3. **Экспериментируйте** - меняйте код и смотрите что происходит
+1. **Complete Level 1** - this will give you a basic understanding of Effect
+2. **Read the documentation** - [Effect Docs](https://effect.website/docs/)
+3. **Experiment** - change the code and see what happens
 
-### Для продолжающих
+### For Intermediate
 
-1. **Заполните детали** - улучшите описания в README.md для Levels 2-15
-2. **Добавьте примеры** - создайте реалистичные примеры для каждого задания
-3. **Напишите тесты** - добавьте больше edge cases
+1. **Fill in the details** - improve descriptions in README.md for Levels 4-15
+2. **Add examples** - create realistic examples for each exercise
+3. **Write tests** - add more edge cases
 
-### Для продвинутых
+### For Advanced
 
-1. **Создайте свои задания** - добавьте новые концепции
-2. **Оптимизируйте** - улучшите performance решений
-3. **Поделитесь** - помогите другим в Discord
+1. **Create your own exercises** - add new concepts
+2. **Optimize** - improve performance of solutions
+3. **Share** - help others in Discord
 
-## Структура каждого задания
+## Exercise Structure
 
-Каждое задание содержит 4 файла:
+Each exercise contains 4 files:
 
 ### `README.md`
-- **Концепция** - что изучаем
-- **Задание** - что нужно сделать
-- **Примеры** - как использовать
-- **Подсказки** - ссылки и советы
-- **Бонус** - дополнительные челленджи
+- **Concept** - what we're learning
+- **Assignment** - what needs to be done
+- **Examples** - how to use it
+- **Hints** - links and tips
+- **Bonus** - additional challenges
 
 ### `exercise.ts`
-- Заготовка с TODO комментариями
-- Типы и интерфейсы
-- Функции для реализации
+- Template with TODO comments
+- Types and interfaces
+- Functions to implement
 
 ### `solution.ts`
-- Эталонное решение
-- Комментарии к сложным местам
+- Reference solution
+- Comments on complex parts
 - Best practices
 
 ### `exercise.test.ts`
-- Автоматические тесты
-- Проверка корректности
+- Automated tests
+- Correctness checks
 - Edge cases
 
-## Текущий статус
+## Current Status
 
-### ✅ Полностью готово
+### ✅ Fully Ready
 
-- **Level 1: Basics** (3 задания)
-  - Creating Effects - детальное описание, примеры, тесты
-  - Running Effects - детальное описание, примеры, тесты
-  - Transforming Effects - детальное описание, примеры, тесты
+- **Level 1: Basics** (3 exercises)
+  - Creating Effects - detailed description, examples, tests
+  - Running Effects - detailed description, examples, tests
+  - Transforming Effects - detailed description, examples, tests
 
-### 📝 Базовая структура (готово к заполнению)
+- **Level 2: Error Handling** (3 exercises)
+  - Expected Errors - detailed description, examples, tests
+  - Catching Errors - detailed description, examples, tests
+  - Fallback Strategies - detailed description, examples, tests
 
-- **Levels 2-15** (44 задания)
-  - Директории созданы
-  - Placeholder файлы созданы
-  - Готовы к добавлению деталей
+- **Level 3: Control Flow** (3 exercises)
+  - Conditional Logic - detailed description, examples, tests
+  - Looping - detailed description, examples, tests
+  - Combining Effects - detailed description, examples, tests
 
-## Как заполнить остальные задания
+### 📝 Basic Structure (ready to fill)
 
-Для каждого задания в Levels 2-15:
+- **Levels 4-15** (38 exercises)
+  - Directories created
+  - Placeholder files created
+  - Ready for details
 
-1. **Обновите README.md**
-   - Добавьте детальное описание концепции
-   - Приведите конкретные примеры
-   - Добавьте ссылки на документацию
+## How to Fill Remaining Exercises
 
-2. **Обновите exercise.ts**
-   - Добавьте конкретные функции для реализации
-   - Добавьте типы и интерфейсы
-   - Добавьте TODO комментарии
+For each exercise in Levels 4-15:
 
-3. **Создайте solution.ts**
-   - Реализуйте эталонное решение
-   - Добавьте комментарии
-   - Покажите best practices
+1. **Update README.md**
+   - Add detailed concept description
+   - Provide concrete examples
+   - Add links to documentation
 
-4. **Обновите exercise.test.ts**
-   - Добавьте конкретные тесты
-   - Проверьте edge cases
-   - Убедитесь что solution проходит тесты
+2. **Update exercise.ts**
+   - Add specific functions to implement
+   - Add types and interfaces
+   - Add TODO comments
 
-## Полезные ресурсы
+3. **Create solution.ts**
+   - Implement reference solution
+   - Add comments
+   - Show best practices
+
+4. **Update exercise.test.ts**
+   - Add specific tests
+   - Check edge cases
+   - Ensure solution passes tests
+
+## Useful Resources
 
 - 📚 [Effect Documentation](https://effect.website/docs/)
 - 💬 [Effect Discord](https://discord.gg/effect-ts)
@@ -207,16 +217,16 @@ npm run check
 - 📝 [Effect Blog](https://effect.website/blog/)
 - 🎥 [Effect YouTube](https://youtube.com/@effect-ts)
 
-## Поддержка
+## Support
 
-Если у вас вопросы:
+If you have questions:
 
-1. Проверьте `GUIDE.md` - руководство по использованию
-2. Посмотрите `EXERCISES.md` - список всех заданий
-3. Задайте вопрос в [Discord](https://discord.gg/effect-ts)
+1. Check `GUIDE.md` - usage guide
+2. See `EXERCISES.md` - list of all exercises
+3. Ask in [Discord](https://discord.gg/effect-ts)
 
 ---
 
-**Удачи в изучении Effect!** 🚀
+**Good luck learning Effect!** 🚀
 
-Начните с `cd exercises/01-basics/01-creating-effects` и `cat README.md`
+Start with `cd exercises/01-basics/01-creating-effects` and `cat README.md`

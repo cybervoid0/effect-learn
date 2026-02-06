@@ -1,8 +1,8 @@
 # Conditional Logic
 
-## Концепция
+## Concept
 
-Effect предоставляет функциональные операторы для условной логики, которые работают с эффектами.
+Effect provides functional operators for conditional logic that work with effects.
 
 ### `Effect.if`
 Условное выполнение с Effect условием:
@@ -15,16 +15,16 @@ const result = Effect.if(Effect.succeed(true), {
 ```
 
 ### `Effect.when`
-Выполняет Effect только если условие true:
+Executes Effect only if condition is true:
 ```typescript
 const maybeLog = Effect.when(shouldLog, () => 
   Effect.log("Logging enabled")
 )
-// Effect<Option<void>> - Some(void) если true, None если false
+// Effect<Option<void>> - Some(void) if true, None if false
 ```
 
 ### `Effect.unless`
-Выполняет Effect только если условие false:
+Executes Effect only if condition is false:
 ```typescript
 const maybeError = Effect.unless(isValid, () =>
   Effect.fail("Invalid input")
@@ -32,7 +32,7 @@ const maybeError = Effect.unless(isValid, () =>
 ```
 
 ### `Effect.filterOrFail`
-Фильтрует значение или падает с ошибкой:
+Filters a value or fails with an error:
 ```typescript
 const positive = Effect.succeed(-5).pipe(
   Effect.filterOrFail(
@@ -40,11 +40,11 @@ const positive = Effect.succeed(-5).pipe(
     () => "Number must be positive"
   )
 )
-// Effect<number, string> - упадёт с ошибкой
+// Effect<number, string> - will fail with error
 ```
 
-### Обычный if-else с Effect
-Можно использовать обычный JavaScript if:
+### Regular if-else with Effect
+You can use regular JavaScript if:
 ```typescript
 const result = (n: number) =>
   n > 0 
@@ -52,34 +52,34 @@ const result = (n: number) =>
     : Effect.fail("negative")
 ```
 
-## Задание
+## Assignment
 
-Реализуйте следующие функции в файле `exercise.ts`:
+Implement the following functions in `exercise.ts`:
 
-1. **conditionalEffect** - вернуть "positive" если n > 0, иначе "non-positive"
-2. **logIfTrue** - залогировать сообщение только если condition true
-3. **failUnless** - упасть с ошибкой если условие false
-4. **filterPositive** - отфильтровать положительные числа или упасть
-5. **complexConditional** - сложная условная логика с несколькими проверками
+1. **conditionalEffect** - return "positive" if n > 0, otherwise "non-positive"
+2. **logIfTrue** - log message only if condition is true
+3. **failUnless** - fail with error if condition is false
+4. **filterPositive** - filter positive numbers or fail
+5. **complexConditional** - complex conditional logic with multiple checks
 
-## Примеры
+## Examples
 
 ```typescript
 import { Effect, Option } from "effect"
 
-// Простой if-else
+// Simple if-else
 const check = (n: number) =>
   n > 0 
     ? Effect.succeed("positive")
     : Effect.succeed("non-positive")
 
-// Effect.if с Effect условием
+// Effect.if with Effect condition
 const dynamic = Effect.if(Effect.succeed(true), {
   onTrue: () => Effect.succeed("yes"),
   onFalse: () => Effect.succeed("no")
 })
 
-// Effect.when - условное выполнение
+// Effect.when - conditional execution
 const maybeLog = Effect.when(true, () => 
   Effect.log("This will execute")
 )
@@ -90,7 +90,7 @@ const noLog = Effect.when(false, () =>
 )
 // Effect<Option<void>> - None
 
-// Effect.unless - обратное условие
+// Effect.unless - inverse condition
 const maybeError = Effect.unless(isValid, () =>
   Effect.fail("Invalid")
 )
@@ -103,7 +103,7 @@ const onlyPositive = Effect.succeed(5).pipe(
   )
 )
 
-// Сложная логика
+// Complex logic
 const validate = (age: number) =>
   age < 0
     ? Effect.fail("negative")
@@ -114,18 +114,18 @@ const validate = (age: number) =>
     : Effect.succeed("adult")
 ```
 
-## Подсказки
+## Hints
 
-- Простой if-else с Effect работает отлично
-- `Effect.when` возвращает `Option` - используй `Effect.flatMap` если нужно развернуть
-- `Effect.unless` это инверсия `Effect.when`
-- `filterOrFail` полезен для валидации
-- Можно комбинировать несколько условий через `Effect.gen`
+- Simple if-else with Effect works great
+- `Effect.when` returns `Option` - use `Effect.flatMap` if you need to unwrap
+- `Effect.unless` is the inverse of `Effect.when`
+- `filterOrFail` is useful for validation
+- You can combine multiple conditions via `Effect.gen`
 
-## Бонус
+## Bonus
 
-Попробуйте:
-- Создать switch-case паттерн через Effect
-- Использовать `Effect.gen` для сложной условной логики
-- Реализовать guard паттерн
-- Создать валидатор с множественными условиями
+Try to:
+- Create a switch-case pattern with Effect
+- Use `Effect.gen` for complex conditional logic
+- Implement a guard pattern
+- Create a validator with multiple conditions

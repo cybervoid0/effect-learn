@@ -1,69 +1,109 @@
 # Effect Learning Exercises - Project Status
 
-## ✅ Что создано
+## ✅ What's Created
 
-### Структура проекта
-- ✅ 15 уровней (directories)
-- ✅ 47 заданий (subdirectories)
-- ✅ 188 файлов (4 файла × 47 заданий)
+### Project Structure
+- ✅ 15 levels (directories)
+- ✅ 47 exercises (subdirectories)
+- ✅ 188 files (4 files × 47 exercises)
 
-### Документация
-- ✅ `README.md` - главная страница проекта
-- ✅ `exercises/EXERCISES.md` - список всех заданий с чекбоксами
-- ✅ `exercises/GUIDE.md` - руководство по использованию
-- ✅ `exercises/GETTING_STARTED.md` - быстрый старт
-- ✅ `exercises/test-utils.ts` - утилиты для тестирования
+### Documentation
+- ✅ `README.md` - main project page
+- ✅ `exercises/EXERCISES.md` - list of all exercises with checkboxes
+- ✅ `exercises/GUIDE.md` - usage guide
+- ✅ `exercises/GETTING_STARTED.md` - quick start
+- ✅ `exercises/test-utils.ts` - testing utilities
 
-### Инструменты
-- ✅ `scripts/exercise-cli.ts` - CLI для управления заданиями
-- ✅ `scripts/create-placeholder-exercises.sh` - генератор placeholder'ов
-- ✅ `scripts/generate-exercises.ts` - генератор упражнений
-- ✅ Обновлен `package.json` с новыми скриптами
-- ✅ Обновлен `vitest.config.ts` для поддержки exercises
+### Tools
+- ✅ `scripts/exercise-cli.ts` - CLI for managing exercises
+- ✅ `scripts/create-placeholder-exercises.sh` - placeholder generator
+- ✅ `scripts/generate-exercises.ts` - exercise generator
+- ✅ Updated `package.json` with new scripts
+- ✅ Updated `vitest.config.ts` to support exercises
 
-### Level 1: Basics (ПОЛНОСТЬЮ ГОТОВ) ✅
+### Level 1: Basics (FULLY READY) ✅
 
 #### 01-creating-effects ✅
-- ✅ Детальный README с концепцией, примерами, подсказками
-- ✅ exercise.ts с 5 функциями для реализации
-- ✅ solution.ts с эталонными решениями
-- ✅ exercise.test.ts с 8 тестами
+- ✅ Detailed README with concept, examples, hints
+- ✅ exercise.ts with 5 functions to implement
+- ✅ solution.ts with reference solutions
+- ✅ exercise.test.ts with 8 tests
 
 #### 02-running-effects ✅
-- ✅ Детальный README с концепцией, примерами, подсказками
-- ✅ exercise.ts с 4 функциями для реализации
-- ✅ solution.ts с эталонными решениями
-- ✅ exercise.test.ts с тестами
+- ✅ Detailed README with concept, examples, hints
+- ✅ exercise.ts with 4 functions to implement
+- ✅ solution.ts with reference solutions
+- ✅ exercise.test.ts with tests
 
 #### 03-transforming-effects ✅
-- ✅ Детальный README с концепцией, примерами, подсказками
-- ✅ exercise.ts с 5 функциями для реализации
-- ✅ solution.ts с эталонными решениями
-- ✅ exercise.test.ts с тестами
+- ✅ Detailed README with concept, examples, hints
+- ✅ exercise.ts with 5 functions to implement
+- ✅ solution.ts with reference solutions
+- ✅ exercise.test.ts with tests
 
-### Levels 2-15: Базовая структура (ГОТОВО К ЗАПОЛНЕНИЮ) 📝
+### Level 2: Error Handling (FULLY READY) ✅
 
-Для каждого из 44 оставшихся заданий созданы:
-- 📝 README.md (placeholder с базовой структурой)
+#### 01-expected-errors ✅
+- ✅ Detailed README with concept, examples, hints
+- ✅ exercise.ts with functions to implement
+- ✅ solution.ts with reference solutions
+- ✅ exercise.test.ts with tests
+
+#### 02-catching-errors ✅
+- ✅ Detailed README with concept, examples, hints
+- ✅ exercise.ts with functions to implement
+- ✅ solution.ts with reference solutions
+- ✅ exercise.test.ts with tests
+
+#### 03-fallback-strategies ✅
+- ✅ Detailed README with concept, examples, hints
+- ✅ exercise.ts with functions to implement
+- ✅ solution.ts with reference solutions
+- ✅ exercise.test.ts with tests
+
+### Level 3: Control Flow (FULLY READY) ✅
+
+#### 01-conditional-logic ✅
+- ✅ Detailed README with concept, examples, hints
+- ✅ exercise.ts with 5 functions to implement
+- ✅ solution.ts with reference solutions
+- ✅ exercise.test.ts with tests
+
+#### 02-looping ✅
+- ✅ Detailed README with concept, examples, hints
+- ✅ exercise.ts with 5 functions to implement
+- ✅ solution.ts with reference solutions
+- ✅ exercise.test.ts with tests
+
+#### 03-combining-effects ✅
+- ✅ Detailed README with concept, examples, hints
+- ✅ exercise.ts with 5 functions to implement
+- ✅ solution.ts with reference solutions
+- ✅ exercise.test.ts with tests
+
+### Levels 4-15: Basic Structure (READY TO FILL) 📝
+
+For each of the remaining 38 exercises:
+- 📝 README.md (placeholder with basic structure)
 - 📝 exercise.ts (placeholder)
 - 📝 solution.ts (placeholder)
-- 📝 exercise.test.ts (базовый тест)
+- 📝 exercise.test.ts (basic test)
 
-## 📊 Статистика
+## 📊 Statistics
 
-### Файлы
-- **Всего файлов**: ~200
-- **Полностью готовых**: 15 (Level 1)
-- **Placeholder'ов**: 176 (Levels 2-15)
-- **Документации**: 5
-- **Скриптов**: 4
+### Files
+- **Total files**: ~200
+- **Fully ready**: 36 (Levels 1-3)
+- **Placeholders**: 152 (Levels 4-15)
+- **Documentation**: 5
+- **Scripts**: 4
 
-### Задания
-- **Всего заданий**: 47
-- **Полностью готовых**: 3 (Level 1)
-- **С базовой структурой**: 44 (Levels 2-15)
+### Exercises
+- **Total exercises**: 47
+- **Fully ready**: 9 (Levels 1-3)
+- **With basic structure**: 38 (Levels 4-15)
 
-### Покрытие концепций
+### Concept Coverage
 - ✅ Basics (creating, running, transforming)
 - ✅ Error Handling (expected errors, catching, fallback)
 - ✅ Control Flow (conditionals, loops, combining)
@@ -80,113 +120,113 @@
 - ✅ Configuration & Runtime (Config, ConfigProvider, ManagedRuntime)
 - ✅ Advanced Patterns (Interruption, Supervisor, Effect.gen)
 
-## 🎯 Следующие шаги
+## 🎯 Next Steps
 
-### Для пользователя
+### For Users
 
-1. **Начните с Level 1**
+1. **Start with Level 1**
    ```bash
    cd exercises/01-basics/01-creating-effects
    cat README.md
    ```
 
-2. **Реализуйте задания**
-   - Читайте README.md
-   - Пишите код в exercise.ts
-   - Запускайте тесты: `npm test exercises/01-basics/01-creating-effects`
-   - Сравнивайте с solution.ts
+2. **Implement Exercises**
+   - Read README.md
+   - Write code in exercise.ts
+   - Run tests: `npm test exercises/01-basics/01-creating-effects`
+   - Compare with solution.ts
 
-3. **Заполните остальные уровни** (опционально)
-   - Обновите README.md с деталями
-   - Добавьте конкретные функции в exercise.ts
-   - Реализуйте solution.ts
-   - Напишите тесты в exercise.test.ts
+3. **Fill Remaining Levels** (optional)
+   - Update README.md with details
+   - Add specific functions to exercise.ts
+   - Implement solution.ts
+   - Write tests in exercise.test.ts
 
-### Для разработчика
+### For Developers
 
-Если хотите заполнить остальные задания:
+If you want to fill remaining exercises:
 
-1. **Выберите уровень** (например, Level 2: Error Handling)
-2. **Для каждого задания**:
-   - Изучите концепцию в [Effect Docs](https://effect.website/docs/)
-   - Обновите README.md с детальным описанием
-   - Создайте конкретные функции в exercise.ts
-   - Реализуйте solution.ts
-   - Напишите тесты в exercise.test.ts
-3. **Запустите тесты** чтобы убедиться что всё работает
+1. **Choose a level** (e.g., Level 4: Concurrency)
+2. **For each exercise**:
+   - Study the concept in [Effect Docs](https://effect.website/docs/)
+   - Update README.md with detailed description
+   - Create specific functions in exercise.ts
+   - Implement solution.ts
+   - Write tests in exercise.test.ts
+3. **Run tests** to ensure everything works
 
-## 🚀 Команды
+## 🚀 Commands
 
 ```bash
-# Тестирование
-npm test                                          # Все тесты
-npm test exercises/01-basics/01-creating-effects  # Конкретное задание
+# Testing
+npm test                                          # All tests
+npm test exercises/01-basics/01-creating-effects  # Specific exercise
 npm test -- --watch                               # Watch mode
 
 # CLI
-npm run exercise list                             # Список заданий
+npm run exercise list                             # List exercises
 npm run exercise show 01-basics/01-creating-effects
 npm run exercise test 01-basics/01-creating-effects
 npm run exercise solution 01-basics/01-creating-effects
 
-# Проверка
-npm run check                                     # TypeScript проверка
+# Checking
+npm run check                                     # TypeScript check
 ```
 
-## 📚 Документация
+## 📚 Documentation
 
-- `README.md` - главная страница
-- `exercises/EXERCISES.md` - список всех 47 заданий
-- `exercises/GUIDE.md` - детальное руководство
-- `exercises/GETTING_STARTED.md` - быстрый старт
-- `PROJECT_STATUS.md` - этот файл
+- `README.md` - main page
+- `exercises/EXERCISES.md` - list of all 47 exercises
+- `exercises/GUIDE.md` - detailed guide
+- `exercises/GETTING_STARTED.md` - quick start
+- `PROJECT_STATUS.md` - this file
 
-## 🎓 Рекомендуемый путь обучения
+## 🎓 Recommended Learning Path
 
-1. **Начинающие** (Levels 1-3)
-   - 01-basics (3 задания) ✅ ГОТОВО
-   - 02-error-handling (3 задания) 📝
-   - 03-control-flow (3 задания) 📝
+1. **Beginners** (Levels 1-3)
+   - 01-basics (3 exercises) ✅ READY
+   - 02-error-handling (3 exercises) ✅ READY
+   - 03-control-flow (3 exercises) ✅ READY
 
-2. **Средний уровень** (Levels 4-6)
-   - 04-concurrency (3 задания) 📝
-   - 05-resource-management (2 задания) 📝
-   - 06-services (3 задания) 📝
+2. **Intermediate** (Levels 4-6)
+   - 04-concurrency (3 exercises) 📝
+   - 05-resource-management (2 exercises) 📝
+   - 06-services (3 exercises) 📝
 
-3. **Продвинутые** (Levels 7-15)
-   - 07-state-management (3 задания) 📝
-   - 08-advanced-concurrency (4 задания) 📝
-   - 09-streams (4 задания) 📝
-   - 10-sink (2 задания) 📝
-   - 11-scheduling-caching (3 задания) 📝
-   - 12-batching-requests (2 задания) 📝
-   - 13-observability (3 задания) 📝
-   - 14-configuration-runtime (3 задания) 📝
-   - 15-advanced-patterns (3 задания) 📝
+3. **Advanced** (Levels 7-15)
+   - 07-state-management (3 exercises) 📝
+   - 08-advanced-concurrency (4 exercises) 📝
+   - 09-streams (4 exercises) 📝
+   - 10-sink (2 exercises) 📝
+   - 11-scheduling-caching (3 exercises) 📝
+   - 12-batching-requests (2 exercises) 📝
+   - 13-observability (3 exercises) 📝
+   - 14-configuration-runtime (3 exercises) 📝
+   - 15-advanced-patterns (3 exercises) 📝
 
-## ✨ Особенности
+## ✨ Features
 
-- 🎯 Прогрессивное обучение от простого к сложному
-- 📝 Детальные описания концепций
-- 💡 Примеры и подсказки
-- ✅ Автоматические тесты
-- 🎓 Эталонные решения
-- 🛠️ CLI для управления
-- 📚 Полная документация
+- 🎯 Progressive learning from simple to complex
+- 📝 Detailed concept descriptions
+- 💡 Examples and hints
+- ✅ Automated tests
+- 🎓 Reference solutions
+- 🛠️ CLI for management
+- 📚 Complete documentation
 
-## 🤝 Вклад
+## 🤝 Contributing
 
-Проект открыт для улучшений:
-- Добавьте детали в Levels 2-15
-- Улучшите примеры
-- Добавьте больше тестов
-- Исправьте ошибки
-- Предложите новые задания
+Project is open for improvements:
+- Add details to Levels 4-15
+- Improve examples
+- Add more tests
+- Fix bugs
+- Suggest new exercises
 
 ---
 
-**Статус**: ✅ Готов к использованию (Level 1 полностью готов, остальные готовы к заполнению)
+**Status**: ✅ Ready to use (Levels 1-3 fully ready, others ready to fill)
 
-**Дата создания**: 2026-02-03
+**Created**: 2026-02-03
 
-**Версия**: 1.0.0
+**Version**: 1.0.0

@@ -1,11 +1,11 @@
 # Transforming Effects
 
-## Концепция
+## Concept
 
-Effect предоставляет мощные операторы для трансформации и композиции эффектов.
+Effect provides powerful operators for transforming and composing effects.
 
 ### `map`
-Трансформирует успешное значение Effect:
+Transforms the successful value of an Effect:
 ```typescript
 const doubled = Effect.succeed(21).pipe(
   Effect.map(n => n * 2)
@@ -14,7 +14,7 @@ const doubled = Effect.succeed(21).pipe(
 ```
 
 ### `flatMap`
-Цепочка зависимых Effect (монадическая композиция):
+Chains dependent Effects (monadic composition):
 ```typescript
 const getUserAge = (id: string) => Effect.succeed(25)
 const canVote = (age: number) => Effect.succeed(age >= 18)
@@ -25,48 +25,48 @@ const result = getUserAge("123").pipe(
 ```
 
 ### `andThen`
-Универсальный оператор для последовательной композиции:
+Universal operator for sequential composition:
 ```typescript
-// С функцией
+// With function
 effect.pipe(Effect.andThen(x => Effect.succeed(x * 2)))
 
-// С Effect
+// With Effect
 effect.pipe(Effect.andThen(Effect.succeed(42)))
 
-// С константой
+// With constant
 effect.pipe(Effect.andThen(42))
 ```
 
 ### `tap`
-Выполняет side-effect не изменяя результат:
+Executes a side-effect without changing the result:
 ```typescript
 const logged = Effect.succeed(42).pipe(
   Effect.tap(n => Effect.sync(() => console.log(n)))
 )
-// Effect<number, never, never> -> 42 (но с логированием)
+// Effect<number, never, never> -> 42 (but with logging)
 ```
 
-## Задание
+## Assignment
 
-Реализуйте следующие функции в файле `exercise.ts`:
+Implement the following functions in `exercise.ts`:
 
-1. `doubleValue` - удвоить значение Effect
-2. `chainEffects` - создать цепочку из двух Effect
-3. `transformToString` - преобразовать число в строку
-4. `logAndReturn` - залогировать значение и вернуть его
-5. `calculateTotal` - сложная композиция нескольких операций
+1. `doubleValue` - double the value of an Effect
+2. `chainEffects` - create a chain of two Effects
+3. `transformToString` - transform a number to a string
+4. `logAndReturn` - log the value and return it
+5. `calculateTotal` - complex composition of multiple operations
 
-## Примеры
+## Examples
 
 ```typescript
 import { Effect } from "effect"
 
-// map - простая трансформация
+// map - simple transformation
 const doubled = Effect.succeed(21).pipe(
   Effect.map(n => n * 2)
 )
 
-// flatMap - зависимые операции
+// flatMap - dependent operations
 const divide = (a: number, b: number) =>
   b === 0 
     ? Effect.fail("Division by zero")
@@ -81,7 +81,7 @@ const withLogging = Effect.succeed(42).pipe(
   Effect.tap(n => Effect.sync(() => console.log(`Value: ${n}`)))
 )
 
-// Композиция
+// Composition
 const complex = Effect.succeed(5).pipe(
   Effect.map(n => n * 2),           // 10
   Effect.tap(n => Effect.log(n)),   // log: 10
@@ -94,18 +94,18 @@ const complex = Effect.succeed(5).pipe(
 )
 ```
 
-## Подсказки
+## Hints
 
-- `map` для простых трансформаций значения
-- `flatMap` когда следующая операция возвращает Effect
-- `andThen` как универсальная альтернатива
-- `tap` для side-effects (логирование, метрики)
-- Используйте `pipe` для читаемых цепочек
+- Use `map` for simple value transformations
+- Use `flatMap` when the next operation returns an Effect
+- Use `andThen` as a universal alternative
+- Use `tap` for side-effects (logging, metrics)
+- Use `pipe` for readable chains
 
-## Бонус
+## Bonus
 
-Попробуйте:
-- Создать цепочку из 5+ операций
-- Использовать `Effect.gen` вместо `pipe`
-- Добавить обработку ошибок в цепочку
-- Реализовать retry логику с трансформацией
+Try to:
+- Create a chain of 5+ operations
+- Use `Effect.gen` instead of `pipe`
+- Add error handling to the chain
+- Implement retry logic with transformation

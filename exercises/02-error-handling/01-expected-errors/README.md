@@ -1,28 +1,28 @@
 # Expected Errors
 
-## Концепция
+## Concept
 
-В Effect ошибки являются **частью типа**. Это означает что компилятор знает какие ошибки может выбросить функция и заставляет вас их обработать.
+In Effect, errors are **part of the type**. This means the compiler knows what errors a function can throw and forces you to handle them.
 
-### Типизированные ошибки
+### Typed Errors
 
 ```typescript
 Effect<Success, Error, Requirements>
 //     ^^^^^^^  ^^^^^
-//     Что вернёт  Какие ошибки может выбросить
+//     What it returns  What errors it can throw
 ```
 
 ### `Effect.fail`
-Создаёт Effect который падает с типизированной ошибкой:
+Creates an Effect that fails with a typed error:
 ```typescript
 const error = Effect.fail("Something went wrong")
 // Effect<never, string, never>
 //       ^^^^^  ^^^^^^
-//       никогда не вернёт успех, ошибка типа string
+//       never returns success, error type is string
 ```
 
 ### Tagged Errors (Data.TaggedError)
-Рекомендуемый способ создания ошибок в Effect:
+The recommended way to create errors in Effect:
 ```typescript
 import { Data } from "effect"
 
@@ -33,30 +33,30 @@ class NetworkError extends Data.TaggedError("NetworkError")<{
 const error = new NetworkError({ message: "Connection failed" })
 ```
 
-### Множественные типы ошибок
-Effect может иметь union типов ошибок:
+### Multiple Error Types
+Effect can have a union of error types:
 ```typescript
 type AppError = NetworkError | ValidationError | DatabaseError
 
 const program: Effect.Effect<User, AppError> = ...
 ```
 
-## Задание
+## Assignment
 
-Реализуйте следующие функции в файле `exercise.ts`:
+Implement the following functions in `exercise.ts`:
 
-1. **createSimpleError** - создать Effect с простой строковой ошибкой
-2. **createTaggedError** - создать класс tagged error и использовать его
-3. **parseNumber** - парсить строку в число, возвращать ошибку если невалидно
-4. **divideWithError** - делить числа с типизированной ошибкой при делении на ноль
-5. **validateAge** - валидировать возраст (должен быть >= 0 и <= 120)
+1. **createSimpleError** - create an Effect with a simple string error
+2. **createTaggedError** - create a tagged error class and use it
+3. **parseNumber** - parse a string to number, return error if invalid
+4. **divideWithError** - divide numbers with typed error on division by zero
+5. **validateAge** - validate age (must be >= 0 and <= 120)
 
-## Примеры
+## Examples
 
 ```typescript
 import { Effect, Data } from "effect"
 
-// Простая строковая ошибка
+// Simple string error
 const simpleError = Effect.fail("Oops!")
 
 // Tagged error
@@ -66,7 +66,7 @@ class NotFoundError extends Data.TaggedError("NotFoundError")<{
 
 const notFound = Effect.fail(new NotFoundError({ id: "123" }))
 
-// Функция с типизированной ошибкой
+// Function with typed error
 const getUser = (id: string): Effect.Effect<User, NotFoundError> => {
   if (id === "unknown") {
     return Effect.fail(new NotFoundError({ id }))
@@ -74,7 +74,7 @@ const getUser = (id: string): Effect.Effect<User, NotFoundError> => {
   return Effect.succeed({ id, name: "John" })
 }
 
-// Множественные типы ошибок
+// Multiple error types
 class ValidationError extends Data.TaggedError("ValidationError")<{
   readonly field: string
 }> {}
@@ -90,19 +90,19 @@ const validateAndFetch = (id: string): Effect.Effect<
 }
 ```
 
-## Подсказки
+## Hints
 
-- Используйте `Effect.fail` для создания ошибок
-- `Data.TaggedError` для создания классов ошибок
-- `_tag` поле автоматически добавляется в tagged errors
-- Типы ошибок объединяются через `|` (union)
-- `isNaN()` для проверки числа
-- Используйте условную логику для валидации
+- Use `Effect.fail` to create errors
+- Use `Data.TaggedError` to create error classes
+- `_tag` field is automatically added to tagged errors
+- Error types are combined via `|` (union)
+- Use `isNaN()` to check for valid numbers
+- Use conditional logic for validation
 
-## Бонус
+## Bonus
 
-Попробуйте:
-- Создать иерархию ошибок (базовый класс + наследники)
-- Добавить дополнительные поля в ошибки (timestamp, stack trace)
-- Создать helper функцию для создания ошибок с контекстом
-- Использовать `Effect.gen` для композиции функций с ошибками
+Try to:
+- Create an error hierarchy (base class + subclasses)
+- Add additional fields to errors (timestamp, stack trace)
+- Create a helper function for creating errors with context
+- Use `Effect.gen` for composing functions with errors

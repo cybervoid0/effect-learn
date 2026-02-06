@@ -1,76 +1,76 @@
 # Creating Effects
 
-## Концепция
+## Concept
 
-В Effect, `Effect<A, E, R>` - это описание вычисления, которое:
-- Возвращает значение типа `A` при успехе
-- Может упасть с ошибкой типа `E`
-- Требует окружение (context) типа `R`
+In Effect, `Effect<A, E, R>` is a description of a computation that:
+- Returns a value of type `A` on success
+- Can fail with an error of type `E`
+- Requires an environment (context) of type `R`
 
-Effect - это **ленивое** описание программы. Оно не выполняется до тех пор, пока вы явно не запустите его.
+Effect is a **lazy** description of a program. It doesn't execute until you explicitly run it.
 
-## Основные способы создания Effect
+## Main Ways to Create Effects
 
 ### `Effect.succeed`
-Создает Effect, который всегда успешно возвращает значение:
+Creates an Effect that always successfully returns a value:
 ```typescript
 const effect = Effect.succeed(42)
 // Effect<number, never, never>
 ```
 
 ### `Effect.fail`
-Создает Effect, который всегда падает с ошибкой:
+Creates an Effect that always fails with an error:
 ```typescript
 const effect = Effect.fail("Oops!")
 // Effect<never, string, never>
 ```
 
 ### `Effect.sync`
-Создает Effect из синхронной функции:
+Creates an Effect from a synchronous function:
 ```typescript
 const effect = Effect.sync(() => Math.random())
 // Effect<number, never, never>
 ```
 
 ### `Effect.try`
-Создает Effect из функции, которая может бросить исключение:
+Creates an Effect from a function that can throw an exception:
 ```typescript
 const effect = Effect.try(() => JSON.parse('{"key": "value"}'))
 // Effect<any, UnknownException, never>
 ```
 
 ### `Effect.promise`
-Создает Effect из функции, возвращающей Promise:
+Creates an Effect from a function returning a Promise:
 ```typescript
 const effect = Effect.promise(() => fetch("https://api.example.com"))
 // Effect<Response, never, never>
 ```
 
-## Задание
+## Assignment
 
-Реализуйте следующие функции в файле `exercise.ts`:
+Implement the following functions in `exercise.ts`:
 
-1. `createSuccessEffect` - создает Effect, возвращающий число 42
-2. `createFailureEffect` - создает Effect, падающий с ошибкой "Something went wrong"
-3. `createRandomEffect` - создает Effect, возвращающий случайное число от 0 до 100
-4. `createDateEffect` - создает Effect, возвращающий текущую дату в формате ISO string
-5. `createDivisionEffect` - создает Effect, делящий два числа (обработайте деление на ноль)
+1. `createSuccessEffect` - creates an Effect returning the number 42
+2. `createFailureEffect` - creates an Effect failing with error "Something went wrong"
+3. `createRandomEffect` - creates an Effect returning a random number from 0 to 100
+4. `createDateEffect` - creates an Effect returning the current date in ISO string format
+5. `createDivisionEffect` - creates an Effect dividing two numbers (handle division by zero)
 
-## Примеры
+## Examples
 
 ```typescript
 import { Effect } from "effect"
 
-// Простой успешный Effect
+// Simple successful Effect
 const greeting = Effect.succeed("Hello, Effect!")
 
-// Effect с вычислением
+// Effect with computation
 const computation = Effect.sync(() => {
   console.log("Computing...")
   return 2 + 2
 })
 
-// Effect с возможной ошибкой
+// Effect with possible error
 const parseJSON = (text: string) =>
   Effect.try({
     try: () => JSON.parse(text),
@@ -78,16 +78,16 @@ const parseJSON = (text: string) =>
   })
 ```
 
-## Подсказки
+## Hints
 
-- `Effect.succeed` для простых значений
-- `Effect.sync` когда нужно выполнить код, но он не может упасть
-- `Effect.try` когда код может бросить исключение
-- Для деления на ноль используйте `Effect.fail` или условную логику с `Effect.sync`
+- Use `Effect.succeed` for simple values
+- Use `Effect.sync` when you need to execute code that can't fail
+- Use `Effect.try` when code can throw an exception
+- For division by zero, use `Effect.fail` or conditional logic with `Effect.sync`
 
-## Бонус
+## Bonus
 
-Попробуйте создать Effect, который:
-- Читает переменную окружения `NODE_ENV`
-- Возвращает "development" если переменная не установлена
-- Использует `Effect.sync` и `process.env`
+Try to create an Effect that:
+- Reads the `NODE_ENV` environment variable
+- Returns "development" if the variable is not set
+- Uses `Effect.sync` and `process.env`

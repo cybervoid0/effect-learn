@@ -1,28 +1,28 @@
 # Looping
 
-## Концепция
+## Concept
 
-Effect предоставляет функциональные операторы для циклов и итераций.
+Effect provides functional operators for loops and iterations.
 
 ### `Effect.loop`
-Функциональный цикл с accumulator:
+Functional loop with accumulator:
 ```typescript
 const sum = Effect.loop(
-  0,                    // начальное значение
+  0,                    // initial value
   {
-    while: n => n < 5,  // условие продолжения
-    step: n => n + 1,   // следующее значение
-    body: (n, acc) => Effect.succeed(acc + n) // тело цикла
+    while: n => n < 5,  // continuation condition
+    step: n => n + 1,   // next value
+    body: (n, acc) => Effect.succeed(acc + n) // loop body
   }
 )
-// Effect<number> - сумма 0+1+2+3+4 = 10
+// Effect<number> - sum 0+1+2+3+4 = 10
 ```
 
 ### `Effect.iterate`
-Итерация с accumulator:
+Iteration with accumulator:
 ```typescript
 const result = Effect.iterate(
-  0,                    // начальное значение
+  0,                    // initial value
   {
     while: n => n < 100,
     body: n => Effect.succeed(n + 1)
@@ -32,7 +32,7 @@ const result = Effect.iterate(
 ```
 
 ### `Effect.forEach`
-Обработка массива элементов:
+Processing array elements:
 ```typescript
 const numbers = [1, 2, 3, 4, 5]
 
@@ -42,23 +42,23 @@ const doubled = Effect.forEach(numbers, n =>
 // Effect<number[]> - [2, 4, 6, 8, 10]
 ```
 
-### `Effect.forEach` с опциями
+### `Effect.forEach` with options
 ```typescript
-// Последовательная обработка
+// Sequential processing
 Effect.forEach(items, process, { concurrency: 1 })
 
-// Параллельная обработка
+// Parallel processing
 Effect.forEach(items, process, { concurrency: "unbounded" })
 
-// Ограниченная параллельность
+// Limited concurrency
 Effect.forEach(items, process, { concurrency: 5 })
 
-// Discard результаты
+// Discard results
 Effect.forEach(items, process, { discard: true })
 ```
 
 ### `Effect.all`
-Комбинирование массива Effects:
+Combining array of Effects:
 ```typescript
 const effects = [
   Effect.succeed(1),
@@ -70,17 +70,17 @@ const result = Effect.all(effects)
 // Effect<number[]> - [1, 2, 3]
 ```
 
-## Задание
+## Assignment
 
-Реализуйте следующие функции в файле `exercise.ts`:
+Implement the following functions in `exercise.ts`:
 
-1. **sumNumbers** - сумма чисел от 1 до n используя loop
-2. **factorial** - факториал числа используя iterate
-3. **processArray** - обработать массив через forEach
-4. **filterAndMap** - отфильтровать и преобразовать массив
-5. **sequentialVsParallel** - сравнить последовательную и параллельную обработку
+1. **sumNumbers** - sum numbers from 1 to n using loop
+2. **factorial** - factorial of a number using iterate
+3. **processArray** - process array via forEach
+4. **filterAndMap** - filter and transform array
+5. **sequentialVsParallel** - compare sequential and parallel processing
 
-## Примеры
+## Examples
 
 ```typescript
 import { Effect } from "effect"
@@ -113,7 +113,7 @@ const doubled = Effect.forEach(
 )
 // [2, 4, 6]
 
-// forEach с фильтрацией
+// forEach with filtering
 const evenDoubled = Effect.forEach(
   [1, 2, 3, 4, 5],
   n => n % 2 === 0 
@@ -123,7 +123,7 @@ const evenDoubled = Effect.forEach(
   Effect.catchAll(() => Effect.succeed([]))
 )
 
-// all - комбинирование effects
+// all - combining effects
 const results = Effect.all([
   Effect.succeed(1),
   Effect.succeed(2),
@@ -132,20 +132,20 @@ const results = Effect.all([
 // [1, 2, 3]
 ```
 
-## Подсказки
+## Hints
 
-- `Effect.loop` для циклов с accumulator
-- `Effect.iterate` для простых итераций без accumulator
-- `Effect.forEach` для обработки массивов
-- `concurrency` опция контролирует параллельность
-- `discard: true` если результаты не нужны
-- Можно использовать `Effect.gen` с обычными циклами
+- `Effect.loop` for loops with accumulator
+- `Effect.iterate` for simple iterations without accumulator
+- `Effect.forEach` for processing arrays
+- `concurrency` option controls parallelism
+- `discard: true` if results are not needed
+- You can use `Effect.gen` with regular loops
 
-## Бонус
+## Bonus
 
-Попробуйте:
-- Реализовать fibonacci через loop
-- Использовать `Effect.forEach` с `concurrency: 2`
-- Создать while-подобный цикл через iterate
-- Обработать массив с возможными ошибками
-- Использовать `Effect.all` с объектом вместо массива
+Try to:
+- Implement fibonacci via loop
+- Use `Effect.forEach` with `concurrency: 2`
+- Create a while-like loop via iterate
+- Process array with possible errors
+- Use `Effect.all` with object instead of array
