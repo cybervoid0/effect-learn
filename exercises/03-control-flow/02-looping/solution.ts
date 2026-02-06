@@ -9,9 +9,10 @@ export const sumNumbers = (n: number): Effect.Effect<number> => {
 		{
 			while: (i) => i <= n,
 			step: (i) => i + 1,
-			body: (i, acc) => Effect.succeed(acc + i),
+			body: (i) => Effect.succeed(i),
+			discard: false,
 		},
-	)
+	).pipe(Effect.map((numbers) => numbers.reduce((sum, n) => sum + n, 0)))
 }
 
 /**
@@ -19,13 +20,13 @@ export const sumNumbers = (n: number): Effect.Effect<number> => {
  */
 export const factorial = (n: number): Effect.Effect<number> => {
 	return Effect.iterate(
-		[1, 1] as const, // [current, accumulator]
+		{ current: 1, acc: 1 },
 		{
-			while: ([current]) => current <= n,
-			body: ([current, acc]) =>
-				Effect.succeed([current + 1, acc * current] as const),
+			while: ({ current }) => current <= n,
+			body: ({ current, acc }) =>
+				Effect.succeed({ current: current + 1, acc: acc * current }),
 		},
-	).pipe(Effect.map(([_, result]) => result))
+	).pipe(Effect.map(({ acc }) => acc))
 }
 
 /**
@@ -49,17 +50,13 @@ export const filterAndMap = (numbers: number[]): Effect.Effect<number[]> => {
 export const sequentialVsParallel = (
 	numbers: number[],
 ): Effect.Effect<[number[], number[]]> => {
-	const sequential = Effect.forEach(
-		numbers,
-		(n) => Effect.succeed(n * 2),
-		{ concurrency: 1 },
-	)
+	const sequential = Effect.forEach(numbers, (n) => Effect.succeed(n * 2), {
+		concurrency: 1,
+	})
 
-	const parallel = Effect.forEach(
-		numbers,
-		(n) => Effect.succeed(n * 2),
-		{ concurrency: "unbounded" },
-	)
+	const parallel = Effect.forEach(numbers, (n) => Effect.succeed(n * 2), {
+		concurrency: "unbounded",
+	})
 
 	return Effect.all([sequential, parallel])
 }

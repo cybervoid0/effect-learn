@@ -14,7 +14,9 @@ export const logIfTrue = (
 	condition: boolean,
 	message: string,
 ): Effect.Effect<Option.Option<void>> => {
-	return Effect.when(condition, () => Effect.log(message))
+	return condition
+		? Effect.log(message).pipe(Effect.map(() => Option.some(undefined)))
+		: Effect.succeed(Option.none())
 }
 
 /**

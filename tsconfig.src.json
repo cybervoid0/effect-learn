@@ -1,10 +1,10 @@
 {
   "extends": "./tsconfig.base.json",
-  "include": ["src"],
+  "include": ["exercises/**/*.ts"],
+  "exclude": ["exercises/**/*.test.ts"],
   "compilerOptions": {
     "types": ["node"],
     "tsBuildInfoFile": ".tsbuildinfo/src.tsbuildinfo",
-    "rootDir": "src",
     "noEmit": true
   }
 }

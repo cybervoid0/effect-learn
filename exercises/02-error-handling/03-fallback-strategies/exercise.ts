@@ -1,11 +1,12 @@
-import { Effect, Schedule } from "effect"
+import { Effect } from "effect"
+import type * as Cause from "effect/Cause"
 
 /**
  * TODO: Try primary effect, if it fails use fallback effect
  */
 export const withFallback = <A, E>(
 	primary: Effect.Effect<A, E>,
-	fallback: Effect.Effect<A, E>,
+	_fallback: Effect.Effect<A, E>,
 ): Effect.Effect<A, E> => {
 	// Your code here
 	return primary // Replace with correct implementation
@@ -26,7 +27,7 @@ export const retryThreeTimes = <A, E>(
  */
 export const withTimeout = <A, E>(
 	effect: Effect.Effect<A, E>,
-): Effect.Effect<A, E | Effect.TimeoutException> => {
+): Effect.Effect<A, E | Cause.TimeoutException> => {
 	// Your code here
 	return effect // Replace with correct implementation
 }
@@ -50,7 +51,7 @@ export const retryWithExponentialBackoff = <A, E>(
  * 3. If still fails, use fallback value
  */
 export const robustOperation = <A>(
-	operation: Effect.Effect<A, string>,
+	_operation: Effect.Effect<A, string>,
 	fallbackValue: A,
 ): Effect.Effect<A, never> => {
 	// Your code here

@@ -30,7 +30,7 @@ export const combineArray = (
 }
 
 /**
- * Combine an object of Effects using Effect.struct
+ * Combine an object of Effects using Effect.all
  */
 export const combineObject = (effects: {
 	name: Effect.Effect<string>
@@ -41,7 +41,7 @@ export const combineObject = (effects: {
 	age: number
 	active: boolean
 }> => {
-	return Effect.struct(effects)
+	return Effect.all(effects)
 }
 
 /**
