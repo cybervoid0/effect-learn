@@ -1,11 +1,13 @@
-import { Effect } from "effect"
+import { Effect, pipe } from "effect"
 
 /**
  * TODO: Double the value of an Effect
  */
-export const doubleValue = (effect: Effect.Effect<number>): Effect.Effect<number> => {
+export const doubleValue = (
+	effect: Effect.Effect<number>,
+): Effect.Effect<number> => {
 	// Your code here
-	return effect // Replace with correct implementation
+	return effect.pipe(Effect.map((n) => n * 2))
 }
 
 /**
@@ -14,18 +16,20 @@ export const doubleValue = (effect: Effect.Effect<number>): Effect.Effect<number
  */
 export const chainEffects = (
 	first: Effect.Effect<number>,
-	double: (n: number) => Effect.Effect<number>
+	double: (n: number) => Effect.Effect<number>,
 ): Effect.Effect<number> => {
 	// Your code here
-	return first // Replace with correct implementation
+	return first.pipe(Effect.flatMap(double)) // Replace with correct implementation
 }
 
 /**
  * TODO: Transform a number Effect to a string Effect
  */
-export const transformToString = (effect: Effect.Effect<number>): Effect.Effect<string> => {
+export const transformToString = (
+	effect: Effect.Effect<number>,
+): Effect.Effect<string> => {
 	// Your code here
-	return Effect.succeed("") // Replace with correct implementation
+	return effect.pipe(Effect.map(String)) // Replace with correct implementation
 }
 
 /**
@@ -33,7 +37,7 @@ export const transformToString = (effect: Effect.Effect<number>): Effect.Effect<
  */
 export const logAndReturn = <A>(effect: Effect.Effect<A>): Effect.Effect<A> => {
 	// Your code here
-	return effect // Replace with correct implementation
+	return effect.pipe(Effect.tap(Effect.log)) // Replace with correct implementation
 }
 
 /**
@@ -45,5 +49,9 @@ export const logAndReturn = <A>(effect: Effect.Effect<A>): Effect.Effect<A> => {
  */
 export const calculateTotal = (n: number): Effect.Effect<string> => {
 	// Your code here
-	return Effect.succeed("") // Replace with correct implementation
+	return Effect.succeed(n).pipe(
+		Effect.map((n) => n + 10),
+		Effect.map((n) => n * 2),
+		Effect.map((n) => `Result: ${n}`),
+	) // Replace with correct implementation
 }
