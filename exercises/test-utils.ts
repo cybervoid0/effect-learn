@@ -1,5 +1,5 @@
 import { expect } from "@effect/vitest"
-import { Effect, Exit, type Fiber } from "effect"
+import { Effect, Exit, type Fiber, FiberStatus } from "effect"
 
 /**
  * Test utilities for Effect exercises
@@ -37,7 +37,7 @@ export const expectSuccess = <A, E>(
  */
 export const expectFailure = <A, E>(
 	effect: Effect.Effect<A, E>,
-	expectedError: E,
+	_expectedError: E,
 ): void => {
 	const exit = Effect.runSyncExit(effect)
 	if (Exit.isFailure(exit)) {
@@ -81,8 +81,8 @@ export const measureTime = <A, E, R>(
  * Helper to check if a Fiber is still running
  */
 export const isFiberRunning = (fiber: Fiber.RuntimeFiber<unknown, unknown>) => {
-	const status = fiber.status()
-	return status._tag === "Running"
+	const status = fiber.status
+	return status.pipe(Effect.map(FiberStatus.isRunning))
 }
 
 /**

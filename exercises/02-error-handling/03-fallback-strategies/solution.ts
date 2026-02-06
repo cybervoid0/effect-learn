@@ -1,4 +1,5 @@
 import { Effect, Schedule } from "effect"
+import type * as Cause from "effect/Cause"
 
 /**
  * Try primary effect, if it fails use fallback effect
@@ -24,7 +25,7 @@ export const retryThreeTimes = <A, E>(
  */
 export const withTimeout = <A, E>(
 	effect: Effect.Effect<A, E>,
-): Effect.Effect<A, E | Effect.TimeoutException> => {
+): Effect.Effect<A, E | Cause.TimeoutException> => {
 	return effect.pipe(Effect.timeout("1 second"))
 }
 

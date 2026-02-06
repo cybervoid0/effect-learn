@@ -1,148 +1,189 @@
 # Effect Learning Exercises
 
-Прогрессивный курс изучения Effect от базовых концепций до продвинутых паттернов в стиле Exercism.
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.0+-blue.svg)](https://www.typescriptlang.org/)
+[![Effect](https://img.shields.io/badge/Effect-3.0+-purple.svg)](https://effect.website/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-## 📚 О проекте
+> A progressive, hands-on course for learning Effect from basic concepts to advanced patterns, inspired by Exercism.
 
-Этот проект содержит **47 учебных заданий**, разделенных на **15 уровней**, которые покрывают все основные концепции Effect:
+## 🎯 What is This?
 
-- ✅ Basics (создание, запуск, трансформация)
-- ✅ Error Handling (типизированные ошибки, fallback)
-- ✅ Control Flow (условия, циклы, комбинирование)
-- ✅ Concurrency (Fibers, racing, параллелизм)
-- ✅ Resource Management (Scope, acquire/release)
-- ✅ Services & Layers (Dependency Injection)
-- ✅ State Management (Ref, SynchronizedRef, SubscriptionRef)
-- ✅ Advanced Concurrency (Deferred, Queue, PubSub, Semaphore)
-- ✅ Streams & Sink (обработка потоков данных)
-- ✅ Scheduling & Caching
-- ✅ Batching & Requests (оптимизация запросов)
-- ✅ Observability (Logging, Metrics, Tracing)
-- ✅ Configuration & Runtime
-- ✅ Advanced Patterns (Interruption, Supervisor)
+This project contains **47 learning exercises** divided into **15 levels**, covering all core Effect concepts through practical, test-driven assignments.
 
-## 🚀 Быстрый старт
+Unlike tutorials or documentation, this is a **structured learning path** where you:
+- ✅ Write real code, not just read examples
+- ✅ Get instant feedback from automated tests
+- ✅ Compare your solutions with reference implementations
+- ✅ Progress from basics to advanced patterns systematically
 
-### Установка
+## 📚 What You'll Learn
+
+- ✅ **Basics** - creating, running, transforming Effects
+- ✅ **Error Handling** - typed errors, catching, fallback strategies
+- ✅ **Control Flow** - conditionals, loops, combining effects
+- ✅ **Concurrency** - Fibers, racing, parallel execution
+- ✅ **Resource Management** - Scope, acquire/release patterns
+- ✅ **Services & Layers** - Dependency Injection the Effect way
+- ✅ **State Management** - Ref, SynchronizedRef, SubscriptionRef
+- ✅ **Advanced Concurrency** - Deferred, Queue, PubSub, Semaphore
+- ✅ **Streams & Sink** - processing data streams
+- ✅ **Scheduling & Caching** - retry policies, caching strategies
+- ✅ **Batching & Requests** - optimizing request patterns
+- ✅ **Observability** - Logging, Metrics, Tracing
+- ✅ **Configuration & Runtime** - managing app configuration
+- ✅ **Advanced Patterns** - Interruption, Supervision, Effect.gen
+
+## 🚀 Quick Start
+
+### Installation
 
 ```bash
-# Установите зависимости
+# Clone the repository
+git clone https://github.com/yourusername/effect-learn.git
+cd effect-learn
+
+# Install dependencies
 npm install
-# или
+# or
 pnpm install
-# или
+# or
 bun install
 ```
 
-### Начало работы
+### Your First Exercise
 
-1. Откройте список заданий:
-```bash
-cat exercises/EXERCISES.md
-```
-
-2. Прочитайте руководство:
+1. **Read the guide**:
 ```bash
 cat exercises/GUIDE.md
 ```
 
-3. Начните с первого задания:
+2. **Start with Level 1**:
 ```bash
 cd exercises/01-basics/01-creating-effects
 cat README.md
 ```
 
-4. Реализуйте функции в `exercise.ts`
+3. **Implement the functions** in `exercise.ts`
 
-5. Запустите тесты:
+4. **Run the tests**:
 ```bash
 npm test exercises/01-basics/01-creating-effects
 ```
 
-## 📖 Структура
+5. **Compare with solution** if stuck:
+```bash
+cat solution.ts
+```
+
+## 📖 Structure
 
 ```
 exercises/
-├── 01-basics/              # Level 1: Основы (3 задания)
-├── 02-error-handling/      # Level 2: Обработка ошибок (3 задания)
-├── 03-control-flow/        # Level 3: Управление потоком (3 задания)
-├── 04-concurrency/         # Level 4: Конкурентность (3 задания)
-├── 05-resource-management/ # Level 5: Управление ресурсами (2 задания)
-├── 06-services/            # Level 6: Сервисы (3 задания)
-├── 07-state-management/    # Level 7: Состояние (3 задания)
-├── 08-advanced-concurrency/# Level 8: Продвинутая конкурентность (4 задания)
-├── 09-streams/             # Level 9: Потоки (4 задания)
-├── 10-sink/                # Level 10: Sink (2 задания)
-├── 11-scheduling-caching/  # Level 11: Планирование и кэш (3 задания)
-├── 12-batching-requests/   # Level 12: Батчинг (2 задания)
-├── 13-observability/       # Level 13: Наблюдаемость (3 задания)
-├── 14-configuration-runtime/# Level 14: Конфигурация (3 задания)
-├── 15-advanced-patterns/   # Level 15: Продвинутые паттерны (3 задания)
-├── EXERCISES.md            # Полный список заданий
-├── GUIDE.md                # Руководство по использованию
-└── test-utils.ts           # Утилиты для тестирования
+├── 01-basics/              # Level 1: Basics (3 exercises)
+├── 02-error-handling/      # Level 2: Error Handling (3 exercises)
+├── 03-control-flow/        # Level 3: Control Flow (3 exercises)
+├── 04-concurrency/         # Level 4: Concurrency (3 exercises)
+├── 05-resource-management/ # Level 5: Resource Management (2 exercises)
+├── 06-services/            # Level 6: Services (3 exercises)
+├── 07-state-management/    # Level 7: State Management (3 exercises)
+├── 08-advanced-concurrency/# Level 8: Advanced Concurrency (4 exercises)
+├── 09-streams/             # Level 9: Streams (4 exercises)
+├── 10-sink/                # Level 10: Sink (2 exercises)
+├── 11-scheduling-caching/  # Level 11: Scheduling & Caching (3 exercises)
+├── 12-batching-requests/   # Level 12: Batching (2 exercises)
+├── 13-observability/       # Level 13: Observability (3 exercises)
+├── 14-configuration-runtime/# Level 14: Configuration (3 exercises)
+├── 15-advanced-patterns/   # Level 15: Advanced Patterns (3 exercises)
+├── EXERCISES.md            # Complete list of exercises
+├── GUIDE.md                # Usage guide
+└── test-utils.ts           # Testing utilities
 ```
 
-Каждое задание содержит:
-- `README.md` - описание концепции и задания
-- `exercise.ts` - файл для вашего решения
-- `solution.ts` - эталонное решение
-- `exercise.test.ts` - автоматические тесты
+### Each Exercise Contains:
+- 📝 `README.md` - concept explanation and assignment
+- 💻 `exercise.ts` - your solution file
+- ✅ `solution.ts` - reference solution
+- 🧪 `exercise.test.ts` - automated tests
 
-## 🧪 Команды
+## 🧪 Commands
 
 ```bash
-# Запустить все тесты
+# Run all tests
 npm test
 
-# Запустить тесты конкретного задания
+# Run specific exercise tests
 npm test exercises/01-basics/01-creating-effects
 
 # Watch mode
 npm test -- --watch
 
-# Coverage
+# Coverage report
 npm run coverage
 
-# Проверка типов
+# Type checking
 npm run check
 
-# Сборка
+# Build
 npm run build
 ```
 
-## 📝 Как работать с заданиями
+## 📝 How to Work with Exercises
 
-1. **Читайте README.md** - изучите концепцию
-2. **Реализуйте exercise.ts** - напишите код
-3. **Запустите тесты** - проверьте решение
-4. **Сравните с solution.ts** - если застряли
-5. **Отметьте прогресс** - в EXERCISES.md
+1. **Read README.md** - understand the concept
+2. **Implement exercise.ts** - write your code
+3. **Run tests** - verify your solution
+4. **Compare with solution.ts** - if you're stuck
+5. **Track progress** - mark completed in EXERCISES.md
 
-## 🎯 Рекомендуемый порядок
+## 🎯 Recommended Learning Path
 
-Задания организованы по возрастанию сложности:
+Exercises are organized by increasing difficulty:
 
-1. **Начинающие**: Levels 1-3 (Basics, Errors, Control Flow)
-2. **Средний уровень**: Levels 4-6 (Concurrency, Resources, Services)
-3. **Продвинутые**: Levels 7-15 (State, Streams, Observability, etc.)
+1. **Beginners**: Levels 1-3 (Basics, Errors, Control Flow) - ✅ **Fully Ready**
+2. **Intermediate**: Levels 4-6 (Concurrency, Resources, Services)
+3. **Advanced**: Levels 7-15 (State, Streams, Observability, etc.)
 
-## 📚 Дополнительные ресурсы
+## 🌟 Features
 
-- [Effect Documentation](https://effect.website/docs/) - официальная документация
-- [Effect Discord](https://discord.gg/effect-ts) - сообщество
-- [Effect GitHub](https://github.com/Effect-TS/effect) - исходный код
-- [Effect Blog](https://effect.website/blog/) - статьи и туториалы
+- 🎯 **Progressive Learning** - from simple to complex
+- 📝 **Detailed Explanations** - concept + examples + hints
+- ✅ **Automated Tests** - instant feedback
+- 🎓 **Reference Solutions** - learn best practices
+- 🛠️ **CLI Tools** - convenient exercise management
+- 📚 **Complete Documentation** - guides and resources
 
-## 🤝 Вклад
+## 📊 Current Status
 
-Нашли ошибку или хотите улучшить задание? Создайте issue или pull request!
+- ✅ **Levels 1-3**: Fully ready with detailed content (9 exercises)
+- 📝 **Levels 4-15**: Basic structure ready to fill (38 exercises)
 
-## 📄 Лицензия
+See [PROJECT_STATUS.md](./PROJECT_STATUS.md) for details.
 
-MIT
+## 📚 Additional Resources
+
+- 📖 [Effect Documentation](https://effect.website/docs/) - official docs
+- 💬 [Effect Discord](https://discord.gg/effect-ts) - community chat
+- 🐙 [Effect GitHub](https://github.com/Effect-TS/effect) - source code
+- 📝 [Effect Blog](https://effect.website/blog/) - articles and tutorials
+- 🎥 [Effect YouTube](https://youtube.com/@effect-ts) - video content
+
+## 🤝 Contributing
+
+Found a bug or want to improve an exercise? Contributions are welcome!
+
+1. Fork the repository
+2. Create your feature branch
+3. Make your changes
+4. Submit a pull request
+
+See [CONTRIBUTING.md](./CONTRIBUTING.md) for details.
+
+## 📄 License
+
+MIT © [Your Name]
 
 ---
 
-**Удачи в изучении Effect!** 🚀
+**Happy learning Effect!** 🚀
 
+If you find this useful, please ⭐ star the repository and share it with others!

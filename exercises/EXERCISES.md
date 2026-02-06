@@ -1,152 +1,152 @@
 # Effect Learning Exercises
 
-Полный список упражнений для изучения Effect от базовых концепций до продвинутых паттернов.
+Complete list of exercises for learning Effect from basic concepts to advanced patterns.
 
-## Как использовать
+## How to Use
 
-1. Начните с Level 1 и двигайтесь последовательно
-2. Читайте `README.md` в каждом задании для понимания концепции
-3. Реализуйте функции в `exercise.ts`
-4. Запустите тесты: `npm run test:exercise [path]`
-5. Сравните с `solution.ts` если застряли
+1. Start with Level 1 and progress sequentially
+2. Read `README.md` in each exercise to understand the concept
+3. Implement functions in `exercise.ts`
+4. Run tests: `npm test [path]`
+5. Compare with `solution.ts` if stuck
 
-## Прогресс
+## Progress
 
-Отмечайте выполненные задания:
+Mark completed exercises:
 
-## Level 1: Basics (3 задания)
+## Level 1: Basics (3 exercises)
 
-Изучите основы создания, запуска и трансформации Effects.
+Learn the fundamentals of creating, running, and transforming Effects.
 
-- [ ] **01-creating-effects** - Создание Effects с помощью succeed, fail, sync, promise
-- [ ] **02-running-effects** - Запуск Effects с помощью runSync, runPromise, runFork
-- [ ] **03-transforming-effects** - Трансформация Effects с помощью map, flatMap, andThen
+- [ ] **01-creating-effects** - Creating Effects with succeed, fail, sync, promise
+- [ ] **02-running-effects** - Running Effects with runSync, runPromise, runFork
+- [ ] **03-transforming-effects** - Transforming Effects with map, flatMap, andThen
 
-## Level 2: Error Handling (3 задания)
+## Level 2: Error Handling (3 exercises)
 
-Научитесь работать с ошибками в Effect.
+Learn to work with errors in Effect.
 
-- [ ] **01-expected-errors** - Типизированные ошибки через Effect.fail
-- [ ] **02-catching-errors** - Обработка ошибок через catchAll, catchTag, catchSome
-- [ ] **03-fallback-strategies** - Fallback стратегии через orElse, retry, timeout
+- [ ] **01-expected-errors** - Typed errors via Effect.fail
+- [ ] **02-catching-errors** - Handling errors via catchAll, catchTag, catchSome
+- [ ] **03-fallback-strategies** - Fallback strategies via orElse, retry, timeout
 
-## Level 3: Control Flow (3 задания)
+## Level 3: Control Flow (3 exercises)
 
-Управление потоком выполнения в Effect.
+Control flow management in Effect.
 
-- [ ] **01-conditional-logic** - Условная логика через Effect.if, when, unless
-- [ ] **02-looping** - Циклы через Effect.loop, iterate, forEach
-- [ ] **03-combining-effects** - Комбинирование через Effect.all, zip, struct
+- [ ] **01-conditional-logic** - Conditional logic via Effect.if, when, unless
+- [ ] **02-looping** - Loops via Effect.loop, iterate, forEach
+- [ ] **03-combining-effects** - Combining via Effect.all, zip, struct
 
-## Level 4: Concurrency (3 задания)
+## Level 4: Concurrency (3 exercises)
 
-Основы конкурентности и работы с Fibers.
+Concurrency basics and working with Fibers.
 
-- [ ] **01-fibers-basics** - Работа с Fiber через fork, join, await, interrupt
-- [ ] **02-racing-effects** - Racing через Effect.race, raceAll
-- [ ] **03-parallel-execution** - Параллельное выполнение с concurrency
+- [ ] **01-fibers-basics** - Working with Fiber via fork, join, await, interrupt
+- [ ] **02-racing-effects** - Racing via Effect.race, raceAll
+- [ ] **03-parallel-execution** - Parallel execution with concurrency
 
-## Level 5: Resource Management (2 задания)
+## Level 5: Resource Management (2 exercises)
 
-Безопасное управление ресурсами.
+Safe resource management.
 
-- [ ] **01-scope-basics** - Scope и автоматическая очистка через acquireRelease
-- [ ] **02-acquire-release** - Сложные паттерны управления ресурсами
+- [ ] **01-scope-basics** - Scope and automatic cleanup via acquireRelease
+- [ ] **02-acquire-release** - Complex resource management patterns
 
-## Level 6: Services (3 задания)
+## Level 6: Services (3 exercises)
 
-Dependency Injection в Effect.
+Dependency Injection in Effect.
 
-- [ ] **01-defining-services** - Определение сервисов через Context.Tag
-- [ ] **02-using-services** - Использование сервисов через Effect.service
-- [ ] **03-layers** - Композиция сервисов через Layer
+- [ ] **01-defining-services** - Defining services via Context.Tag
+- [ ] **02-using-services** - Using services via Effect.service
+- [ ] **03-layers** - Service composition via Layer
 
-## Level 7: State Management (3 задания)
+## Level 7: State Management (3 exercises)
 
-Управление состоянием в Effect.
+State management in Effect.
 
-- [ ] **01-ref-basics** - Мутабельное состояние через Ref
-- [ ] **02-synchronized-ref** - Атомарные операции через SynchronizedRef
-- [ ] **03-subscription-ref** - Реактивное состояние через SubscriptionRef
+- [ ] **01-ref-basics** - Mutable state via Ref
+- [ ] **02-synchronized-ref** - Atomic operations via SynchronizedRef
+- [ ] **03-subscription-ref** - Reactive state via SubscriptionRef
 
-## Level 8: Advanced Concurrency (4 задания)
+## Level 8: Advanced Concurrency (4 exercises)
 
-Продвинутые примитивы конкурентности.
+Advanced concurrency primitives.
 
-- [ ] **01-deferred** - Синхронизация через Deferred
-- [ ] **02-queue** - Очереди через Queue
-- [ ] **03-pubsub** - Pub-Sub через PubSub
-- [ ] **04-semaphore** - Ограничение конкурентности через Semaphore
+- [ ] **01-deferred** - Synchronization via Deferred
+- [ ] **02-queue** - Queues via Queue
+- [ ] **03-pubsub** - Pub-Sub via PubSub
+- [ ] **04-semaphore** - Concurrency limiting via Semaphore
 
-## Level 9: Streams (4 задания)
+## Level 9: Streams (4 exercises)
 
-Обработка потоков данных.
+Data stream processing.
 
-- [ ] **01-stream-basics** - Создание и потребление Stream
-- [ ] **02-stream-transformations** - Трансформация Stream
-- [ ] **03-stream-combining** - Комбинирование Stream
-- [ ] **04-stream-error-handling** - Обработка ошибок в Stream
+- [ ] **01-stream-basics** - Creating and consuming Stream
+- [ ] **02-stream-transformations** - Transforming Stream
+- [ ] **03-stream-combining** - Combining Stream
+- [ ] **04-stream-error-handling** - Error handling in Stream
 
-## Level 10: Sink (2 задания)
+## Level 10: Sink (2 exercises)
 
-Потребление данных из Stream.
+Consuming data from Stream.
 
-- [ ] **01-sink-basics** - Базовое использование Sink
-- [ ] **02-sink-composition** - Композиция Sink
+- [ ] **01-sink-basics** - Basic Sink usage
+- [ ] **02-sink-composition** - Sink composition
 
-## Level 11: Scheduling & Caching (3 задания)
+## Level 11: Scheduling & Caching (3 exercises)
 
-Планирование и кэширование.
+Scheduling and caching.
 
-- [ ] **01-schedule-basics** - Планирование через Schedule
-- [ ] **02-caching-effects** - Кэширование через Effect.cached
-- [ ] **03-cache-advanced** - Продвинутое кэширование через Cache
+- [ ] **01-schedule-basics** - Scheduling via Schedule
+- [ ] **02-caching-effects** - Caching via Effect.cached
+- [ ] **03-cache-advanced** - Advanced caching via Cache
 
-## Level 12: Batching & Requests (2 задания)
+## Level 12: Batching & Requests (2 exercises)
 
-Батчинг запросов для оптимизации.
+Request batching for optimization.
 
-- [ ] **01-batching-basics** - Батчинг через Request и RequestResolver
-- [ ] **02-batching-advanced** - Продвинутый батчинг и DataLoader паттерн
+- [ ] **01-batching-basics** - Batching via Request and RequestResolver
+- [ ] **02-batching-advanced** - Advanced batching and DataLoader pattern
 
-## Level 13: Observability (3 задания)
+## Level 13: Observability (3 exercises)
 
-Логирование, метрики и трейсинг.
+Logging, metrics, and tracing.
 
-- [ ] **01-logging** - Логирование через встроенный Logger
-- [ ] **02-metrics** - Метрики через Metric
-- [ ] **03-tracing** - Трейсинг через Tracer
+- [ ] **01-logging** - Logging via built-in Logger
+- [ ] **02-metrics** - Metrics via Metric
+- [ ] **03-tracing** - Tracing via Tracer
 
-## Level 14: Configuration & Runtime (3 задания)
+## Level 14: Configuration & Runtime (3 exercises)
 
-Конфигурация и кастомные runtime.
+Configuration and custom runtimes.
 
-- [ ] **01-configuration** - Конфигурация через Config
-- [ ] **02-config-provider** - Кастомный ConfigProvider
-- [ ] **03-runtime-custom** - Кастомный Runtime
+- [ ] **01-configuration** - Configuration via Config
+- [ ] **02-config-provider** - Custom ConfigProvider
+- [ ] **03-runtime-custom** - Custom Runtime
 
-## Level 15: Advanced Patterns (3 задания)
+## Level 15: Advanced Patterns (3 exercises)
 
-Продвинутые паттерны использования Effect.
+Advanced Effect usage patterns.
 
-- [ ] **01-interruption** - Прерывание и graceful shutdown
-- [ ] **02-supervisor** - Надзор за Fiber через Supervisor
-- [ ] **03-effect-gen-advanced** - Продвинутое использование Effect.gen
+- [ ] **01-interruption** - Interruption and graceful shutdown
+- [ ] **02-supervisor** - Fiber supervision via Supervisor
+- [ ] **03-effect-gen-advanced** - Advanced Effect.gen usage
 
 ---
 
-**Всего: 47 заданий**
+**Total: 47 exercises**
 
-## Дополнительные ресурсы
+## Additional Resources
 
 - [Effect Documentation](https://effect.website/docs/)
 - [Effect Discord](https://discord.gg/effect-ts)
 - [Effect GitHub](https://github.com/Effect-TS/effect)
 
-## Советы
+## Tips
 
-- Не спешите, изучайте концепции последовательно
-- Экспериментируйте с кодом
-- Читайте документацию Effect
-- Задавайте вопросы в Discord сообществе
-- Сравнивайте свое решение с эталонным
+- Don't rush, study concepts sequentially
+- Experiment with the code
+- Read Effect documentation
+- Ask questions in Discord community
+- Compare your solution with the reference
