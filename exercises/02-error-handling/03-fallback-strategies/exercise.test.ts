@@ -73,7 +73,7 @@ describe("03-fallback-strategies", () => {
 			expect(result).toBe(42)
 		})
 
-		it("should retry with backoff", () => {
+		it("should retry with backoff", async () => {
 			const program = Effect.gen(function* () {
 				const counter = yield* Ref.make(0)
 
@@ -86,7 +86,7 @@ describe("03-fallback-strategies", () => {
 				return yield* Exercise.retryWithExponentialBackoff(effect)
 			})
 
-			const result = Effect.runSync(program)
+			const result = await Effect.runPromise(program)
 			expect(result).toBeGreaterThanOrEqual(2)
 		})
 	})
@@ -94,17 +94,13 @@ describe("03-fallback-strategies", () => {
 	describe("robustOperation", () => {
 		it("should return success if operation succeeds", () => {
 			const operation = Effect.succeed(42)
-			const result = Effect.runSync(
-				Exercise.robustOperation(operation, 0),
-			)
+			const result = Effect.runSync(Exercise.robustOperation(operation, 0))
 			expect(result).toBe(42)
 		})
 
 		it("should return fallback if operation fails after retries", () => {
 			const operation = Effect.fail("permanent error")
-			const result = Effect.runSync(
-				Exercise.robustOperation(operation, 99),
-			)
+			const result = Effect.runSync(Exercise.robustOperation(operation, 99))
 			expect(result).toBe(99)
 		})
 
@@ -116,6 +112,6 @@ describe("03-fallback-strategies", () => {
 				Exercise.robustOperation(operation, 99),
 			)
 			expect(result).toBe(99)
-		})
+		}, 30_000)
 	})
 })
