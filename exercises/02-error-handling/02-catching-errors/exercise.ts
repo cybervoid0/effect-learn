@@ -1,4 +1,4 @@
-import { Data, Effect, Option } from "effect"
+import { Data, Effect as E, type Effect, Option, Schema } from "effect"
 
 /**
  * Tagged errors for this exercise
@@ -17,10 +17,7 @@ export class ValidationError extends Data.TaggedError("ValidationError")<{
 export const recoverFromError = <A>(
 	effect: Effect.Effect<A, string>,
 	fallback: A,
-): Effect.Effect<A, never> => {
-	// Your code here
-	return effect // Replace with correct implementation
-}
+): Effect.Effect<A, never> => effect.pipe(E.catchAll(() => E.succeed(fallback)))
 
 /**
  * TODO: Catch only NetworkError and return a fallback message
@@ -28,10 +25,10 @@ export const recoverFromError = <A>(
  */
 export const recoverFromNetworkError = (
 	effect: Effect.Effect<string, NetworkError | ValidationError>,
-): Effect.Effect<string, ValidationError> => {
-	// Your code here
-	return effect // Replace with correct implementation
-}
+): Effect.Effect<string, ValidationError> =>
+	effect.pipe(
+		E.catchTag("NetworkError", () => E.succeed("Network error: timeout")),
+	)
 
 /**
  * TODO: Use catchSome to handle only errors that start with "retryable:"
@@ -42,7 +39,14 @@ export const retryOnRetryableError = (
 	effect: Effect.Effect<string, string>,
 ): Effect.Effect<string, string> => {
 	// Your code here
-	return effect // Replace with correct implementation
+	return effect.pipe(
+		E.catchSome((e) => {
+			if (e.startsWith("retryable:")) {
+				return Option.some(E.succeed("retried"))
+			}
+			return Option.none()
+		}),
+	) // Replace with correct implementation
 }
 
 /**
@@ -54,7 +58,12 @@ export const matchResult = (
 	effect: Effect.Effect<number, string>,
 ): Effect.Effect<string, never> => {
 	// Your code here
-	return Effect.succeed("") // Replace with correct implementation
+	return effect.pipe(
+		E.match({
+			onFailure: (e) => `Error: ${e}`,
+			onSuccess: (n) => `Result: ${n}`,
+		}),
+	)
 }
 
 /**
@@ -68,6 +77,18 @@ export const matchResult = (
 export const chainWithErrorHandling = (
 	input: string,
 ): Effect.Effect<number, string> => {
+	const schema = Schema.String.pipe(Schema.parseNumber)
 	// Your code here
-	return Effect.succeed(0) // Replace with correct implementation
+	return Schema.decodeUnknown(schema)(input).pipe(
+		E.mapError(() => "Invalid number"),
+		E.map((x) => x * 2),
+		E.filterOrFail(
+			(x) => x <= 100,
+			() => "Too large",
+		),
+		E.catchIf(
+			(err) => err === "Too large",
+			() => E.succeed(100),
+		),
+	)
 }
