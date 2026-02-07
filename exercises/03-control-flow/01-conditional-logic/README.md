@@ -5,7 +5,7 @@
 Effect provides functional operators for conditional logic that work with effects.
 
 ### `Effect.if`
-Условное выполнение с Effect условием:
+Conditional Effect execution:
 ```typescript
 const result = Effect.if(Effect.succeed(true), {
   onTrue: () => Effect.succeed("yes"),
@@ -17,7 +17,7 @@ const result = Effect.if(Effect.succeed(true), {
 ### `Effect.when`
 Executes Effect only if condition is true:
 ```typescript
-const maybeLog = Effect.when(shouldLog, () => 
+const maybeLog = Effect.when(shouldLog, () =>
   Effect.log("Logging enabled")
 )
 // Effect<Option<void>> - Some(void) if true, None if false
@@ -47,7 +47,7 @@ const positive = Effect.succeed(-5).pipe(
 You can use regular JavaScript if:
 ```typescript
 const result = (n: number) =>
-  n > 0 
+  n > 0
     ? Effect.succeed(n)
     : Effect.fail("negative")
 ```
@@ -69,7 +69,7 @@ import { Effect, Option } from "effect"
 
 // Simple if-else
 const check = (n: number) =>
-  n > 0 
+  n > 0
     ? Effect.succeed("positive")
     : Effect.succeed("non-positive")
 
@@ -80,7 +80,7 @@ const dynamic = Effect.if(Effect.succeed(true), {
 })
 
 // Effect.when - conditional execution
-const maybeLog = Effect.when(true, () => 
+const maybeLog = Effect.when(true, () =>
   Effect.log("This will execute")
 )
 // Effect<Option<void>> - Some(void)
