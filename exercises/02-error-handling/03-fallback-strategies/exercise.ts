@@ -1,35 +1,35 @@
-import { Effect } from "effect"
+import { Effect as E, Effect, Schedule } from "effect"
 import type * as Cause from "effect/Cause"
 
 /**
  * TODO: Try primary effect, if it fails use fallback effect
  */
 export const withFallback = <A, E>(
-	primary: Effect.Effect<A, E>,
-	_fallback: Effect.Effect<A, E>,
-): Effect.Effect<A, E> => {
+	primary: E.Effect<A, E>,
+	fallback: E.Effect<A, E>,
+): E.Effect<A, E> => {
 	// Your code here
-	return primary // Replace with correct implementation
+	return primary.pipe(E.orElse(() => fallback)) // Replace with correct implementation
 }
 
 /**
  * TODO: Retry the effect up to 3 times on failure
  */
 export const retryThreeTimes = <A, E>(
-	effect: Effect.Effect<A, E>,
-): Effect.Effect<A, E> => {
+	effect: E.Effect<A, E>,
+): E.Effect<A, E> => {
 	// Your code here
-	return effect // Replace with correct implementation
+	return effect.pipe(E.retry(Schedule.recurs(3))) // Replace with correct implementation
 }
 
 /**
  * TODO: Add a 1 second timeout to the effect
  */
 export const withTimeout = <A, E>(
-	effect: Effect.Effect<A, E>,
-): Effect.Effect<A, E | Cause.TimeoutException> => {
+	effect: E.Effect<A, E>,
+): E.Effect<A, E | Cause.TimeoutException> => {
 	// Your code here
-	return effect // Replace with correct implementation
+	return effect.pipe(Effect.timeout("1 second")) // Replace with correct implementation
 }
 
 /**
@@ -38,10 +38,16 @@ export const withTimeout = <A, E>(
  * Maximum 5 retries
  */
 export const retryWithExponentialBackoff = <A, E>(
-	effect: Effect.Effect<A, E>,
-): Effect.Effect<A, E> => {
+	effect: E.Effect<A, E>,
+): E.Effect<A, E> => {
 	// Your code here
-	return effect // Replace with correct implementation
+	return effect.pipe(
+		E.retry(
+			Schedule.exponential("100 millis").pipe(
+				Schedule.compose(Schedule.recurs(5)),
+			),
+		),
+	) // Replace with correct implementation
 }
 
 /**
@@ -51,9 +57,13 @@ export const retryWithExponentialBackoff = <A, E>(
  * 3. If still fails, use fallback value
  */
 export const robustOperation = <A>(
-	_operation: Effect.Effect<A, string>,
+	operation: E.Effect<A, string>,
 	fallbackValue: A,
-): Effect.Effect<A, never> => {
+): E.Effect<A, never> => {
 	// Your code here
-	return Effect.succeed(fallbackValue) // Replace with correct implementation
+	return operation.pipe(
+		E.retry(Schedule.recurs(3)),
+		E.timeout("5 seconds"),
+		E.orElse(() => E.succeed(fallbackValue)),
+	)
 }
