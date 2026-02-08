@@ -1,4 +1,4 @@
-import { Effect } from "effect"
+import { type Duration, Effect } from "effect"
 
 /**
  * TODO: Race two effects and return the result of the faster one.
@@ -9,7 +9,7 @@ export const raceTwo = <A>(
 	second: Effect.Effect<A>,
 ): Effect.Effect<A> => {
 	// Your code here
-	return Effect.succeed(undefined as A) // Replace with correct implementation
+	return Effect.race(first, second)
 }
 
 /**
@@ -24,9 +24,12 @@ export const raceWithFallback = (
 	fastDelay: number,
 	slowDelay: number,
 	safeValue: string,
-): Effect.Effect<string> => {
+): Effect.Effect<string, string> => {
 	// Your code here
-	return Effect.succeed("") // Replace with correct implementation
+	return Effect.race(
+		Effect.fail("fast failed").pipe(Effect.delay(fastDelay)),
+		Effect.succeed(safeValue).pipe(Effect.delay(slowDelay)),
+	)
 }
 
 /**
@@ -37,7 +40,7 @@ export const raceAll = <A>(
 	effects: ReadonlyArray<Effect.Effect<A>>,
 ): Effect.Effect<A> => {
 	// Your code here
-	return Effect.succeed(undefined as A) // Replace with correct implementation
+	return Effect.raceAll(effects)
 }
 
 /**
@@ -51,7 +54,7 @@ export const firstSuccessful = <A, E>(
 	effects: ReadonlyArray<Effect.Effect<A, E>>,
 ): Effect.Effect<A, E> => {
 	// Your code here
-	return Effect.succeed(undefined as A) // Replace with correct implementation
+	return Effect.firstSuccessOf(effects)
 }
 
 /**
@@ -63,9 +66,12 @@ export const firstSuccessful = <A, E>(
  */
 export const withTimeout = <A>(
 	effect: Effect.Effect<A>,
-	duration: string,
+	duration: Duration.DurationInput,
 	fallbackValue: A,
 ): Effect.Effect<A> => {
 	// Your code here
-	return Effect.succeed(undefined as A) // Replace with correct implementation
+	return effect.pipe(
+		Effect.timeout(duration),
+		Effect.catchTag("TimeoutException", () => Effect.succeed(fallbackValue)),
+	)
 }
