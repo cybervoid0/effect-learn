@@ -33,7 +33,11 @@ export class ApiServerError extends Data.TaggedClass("ApiServerError")<{
 	readonly code: number
 }> {}
 
-export type ApiResponse = ApiSuccess | ApiNotFound | ApiRateLimited | ApiServerError
+export type ApiResponse =
+	| ApiSuccess
+	| ApiNotFound
+	| ApiRateLimited
+	| ApiServerError
 
 // ── Exercises ──
 
@@ -57,11 +61,14 @@ export const effectIf = <A>(
  * If valid, return the age.
  * If invalid, fail with "Must be at least 18 years old".
  */
-export const filterAdult = (
-	age: number,
-): Effect.Effect<number, string> => {
+export const filterAdult = (age: number): Effect.Effect<number, string> => {
 	// Your code here
-	return Effect.succeed(0) // Replace with correct implementation
+	return Effect.succeed(n).pipe(
+		Effect.filterOrFail(
+			(n) => n > 0,
+			() => "Number must be positive",
+		),
+	)
 }
 
 /**
@@ -104,5 +111,10 @@ export const validateAndTransform = (
 	age: number,
 ): Effect.Effect<string, string> => {
 	// Your code here
-	return Effect.succeed("") // Replace with correct implementation
+	if (n < 0) return Effect.fail("negative")
+	if (n === 0) return Effect.succeed("zero")
+	if (n < 10) return Effect.succeed("small")
+	if (n < 100) return Effect.succeed("medium")
+	return Effect.succeed("large")
+	// Replace with correct implementation
 }
