@@ -53,7 +53,10 @@ export const effectIf = <A>(
 	fallbackEffect: Effect.Effect<A>,
 ): Effect.Effect<A> => {
 	// Your code here
-	return Effect.succeed(undefined as A) // Replace with correct implementation
+	return Effect.if(condition, {
+		onTrue: () => successEffect,
+		onFalse: () => fallbackEffect,
+	})
 }
 
 /**
@@ -63,10 +66,10 @@ export const effectIf = <A>(
  */
 export const filterAdult = (age: number): Effect.Effect<number, string> => {
 	// Your code here
-	return Effect.succeed(n).pipe(
+	return Effect.succeed(age).pipe(
 		Effect.filterOrFail(
-			(n) => n > 0,
-			() => "Number must be positive",
+			(n) => n >= 18,
+			() => "Must be at least 18 years old",
 		),
 	)
 }
@@ -80,9 +83,13 @@ export const filterAdult = (age: number): Effect.Effect<number, string> => {
  */
 export const matchShape = (shape: Shape): number => {
 	// Your code here
-	return 0 // Replace with correct implementation
+	return Match.value(shape).pipe(
+		Match.tag("Circle", (c) => Math.PI * c.radius ** 2),
+		Match.tag("Square", (s) => s.side ** 2),
+		Match.tag("Triangle", (t) => 0.5 * t.base * t.height),
+		Match.exhaustive,
+	)
 }
-
 /**
  * TODO: Use Match.value + Match.tag + Match.exhaustive
  * to handle ApiResponse with Effects.
@@ -94,8 +101,15 @@ export const matchShape = (shape: Shape): number => {
 export const handleApiResponse = (
 	response: ApiResponse,
 ): Effect.Effect<string, string> => {
-	// Your code here
-	return Effect.succeed("") // Replace with correct implementation
+	return Match.value(response).pipe(
+		Match.tag("ApiSuccess", (x) => Effect.succeed(x.data)),
+		Match.tag("ApiNotFound", (x) => Effect.fail(`Not found: ${x.id}`)),
+		Match.tag("ApiRateLimited", (x) =>
+			Effect.fail(`Rate limited, retry after ${x.retryAfter}s`),
+		),
+		Match.tag("ApiServerError", (x) => Effect.fail(`Server error: ${x.code}`)),
+		Match.exhaustive,
+	)
 }
 
 /**
@@ -111,10 +125,27 @@ export const validateAndTransform = (
 	age: number,
 ): Effect.Effect<string, string> => {
 	// Your code here
-	if (n < 0) return Effect.fail("negative")
-	if (n === 0) return Effect.succeed("zero")
-	if (n < 10) return Effect.succeed("small")
-	if (n < 100) return Effect.succeed("medium")
-	return Effect.succeed("large")
-	// Replace with correct implementation
+	return Effect.succeed(age).pipe(
+		Effect.filterOrFail(
+			(age) => age > 0,
+			() => "Invalid age",
+		),
+		Effect.flatMap((filtered) =>
+			Match.value(filtered).pipe(
+				Match.when(
+					(age) => age < 13,
+					() => Effect.succeed("child"),
+				),
+				Match.when(
+					(age) => age < 18,
+					() => Effect.succeed("teenager"),
+				),
+				Match.when(
+					(age) => age < 65,
+					() => Effect.succeed("adult"),
+				),
+				Match.orElse(() => Effect.succeed("senior")),
+			),
+		),
+	)
 }
