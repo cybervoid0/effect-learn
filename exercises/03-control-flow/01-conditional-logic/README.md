@@ -2,130 +2,127 @@
 
 ## Concept
 
-Effect provides functional operators for conditional logic that work with effects.
+Effect provides its own control flow tools that go beyond plain JavaScript `if-else`.
+Use them when conditions involve Effects, when you need exhaustive checking, or when you need to filter/validate effectful values.
 
-### `Effect.if`
-Conditional Effect execution:
+### `Effect.if` - Effect-based condition
+When the **condition itself** is an Effect:
 ```typescript
-const result = Effect.if(Effect.succeed(true), {
-  onTrue: () => Effect.succeed("yes"),
-  onFalse: () => Effect.succeed("no")
+const result = Effect.if(checkFeatureFlag(), {
+  onTrue: () => fetchFromNewApi(),
+  onFalse: () => fetchFromLegacyApi()
 })
-// Effect<string>
 ```
 
-### `Effect.when`
-Executes Effect only if condition is true:
+### `Effect.filterOrFail` - Validate or fail
+Filters the success value or fails with an error:
 ```typescript
-const maybeLog = Effect.when(shouldLog, () =>
-  Effect.log("Logging enabled")
-)
-// Effect<Option<void>> - Some(void) if true, None if false
-```
-
-### `Effect.unless`
-Executes Effect only if condition is false:
-```typescript
-const maybeError = Effect.unless(isValid, () =>
-  Effect.fail("Invalid input")
-)
-```
-
-### `Effect.filterOrFail`
-Filters a value or fails with an error:
-```typescript
-const positive = Effect.succeed(-5).pipe(
+const adult = Effect.succeed(user).pipe(
   Effect.filterOrFail(
-    n => n > 0,
-    () => "Number must be positive"
+    u => u.age >= 18,
+    (u) => new UnderageError({ age: u.age })
   )
 )
-// Effect<number, string> - will fail with error
 ```
 
-### Regular if-else with Effect
-You can use regular JavaScript if:
+### `Match.value` + `Match.exhaustive` - Exhaustive pattern matching
+**The killer feature** - compiler guarantees you handled ALL variants:
 ```typescript
-const result = (n: number) =>
-  n > 0
-    ? Effect.succeed(n)
-    : Effect.fail("negative")
+type Shape =
+  | { _tag: "Circle"; radius: number }
+  | { _tag: "Square"; side: number }
+
+const area = (shape: Shape) =>
+  Match.value(shape).pipe(
+    Match.tag("Circle", ({ radius }) => Math.PI * radius ** 2),
+    Match.tag("Square", ({ side }) => side ** 2),
+    Match.exhaustive // Forgot a variant? Compile error!
+  )
+```
+
+### `Match.value` with Effects
+Combine pattern matching with effectful results:
+```typescript
+const handleError = (error: AppError) =>
+  Match.value(error).pipe(
+    Match.tag("NetworkError", (e) => Effect.retry(fetchData, retryPolicy)),
+    Match.tag("AuthError", () => Effect.fail("Please login")),
+    Match.tag("NotFound", () => Effect.succeed(defaultValue)),
+    Match.exhaustive
+  )
 ```
 
 ## Assignment
 
 Implement the following functions in `exercise.ts`:
 
-1. **conditionalEffect** - return "positive" if n > 0, otherwise "non-positive"
-2. **logIfTrue** - log message only if condition is true
-3. **failUnless** - fail with error if condition is false
-4. **filterPositive** - filter positive numbers or fail
-5. **complexConditional** - complex conditional logic with multiple checks
+1. **effectIf** - use `Effect.if` to choose between two Effects based on an Effect condition
+2. **filterAdult** - use `Effect.filterOrFail` to validate age >= 18
+3. **matchShape** - use `Match.value` + `Match.tag` + `Match.exhaustive` to calculate area
+4. **handleApiResponse** - use `Match.value` with Effects to handle tagged API responses
+5. **validateAndTransform** - combine `filterOrFail` and `Match` for a pipeline
 
 ## Examples
 
 ```typescript
-import { Effect, Option } from "effect"
+import { Effect, Match, Data } from "effect"
 
-// Simple if-else
-const check = (n: number) =>
-  n > 0
-    ? Effect.succeed("positive")
-    : Effect.succeed("non-positive")
+// Effect.if - condition is an Effect
+const greet = (checkPremium: Effect.Effect<boolean>) =>
+  Effect.if(checkPremium, {
+    onTrue: () => Effect.succeed("Welcome, premium user!"),
+    onFalse: () => Effect.succeed("Welcome!")
+  })
 
-// Effect.if with Effect condition
-const dynamic = Effect.if(Effect.succeed(true), {
-  onTrue: () => Effect.succeed("yes"),
-  onFalse: () => Effect.succeed("no")
-})
-
-// Effect.when - conditional execution
-const maybeLog = Effect.when(true, () =>
-  Effect.log("This will execute")
-)
-// Effect<Option<void>> - Some(void)
-
-const noLog = Effect.when(false, () =>
-  Effect.log("This won't execute")
-)
-// Effect<Option<void>> - None
-
-// Effect.unless - inverse condition
-const maybeError = Effect.unless(isValid, () =>
-  Effect.fail("Invalid")
-)
-
-// filterOrFail
-const onlyPositive = Effect.succeed(5).pipe(
-  Effect.filterOrFail(
-    n => n > 0,
-    () => "Must be positive"
+// filterOrFail - validate or fail
+const ensurePositive = (n: number) =>
+  Effect.succeed(n).pipe(
+    Effect.filterOrFail(
+      x => x > 0,
+      () => "Must be positive"
+    )
   )
-)
 
-// Complex logic
-const validate = (age: number) =>
-  age < 0
-    ? Effect.fail("negative")
-    : age > 120
-    ? Effect.fail("too old")
-    : age < 18
-    ? Effect.succeed("minor")
-    : Effect.succeed("adult")
+// Match.exhaustive - compiler checks all cases
+type Light = "red" | "yellow" | "green"
+
+const action = (light: Light) =>
+  Match.value(light).pipe(
+    Match.when("red", () => "stop"),
+    Match.when("yellow", () => "slow down"),
+    Match.when("green", () => "go"),
+    Match.exhaustive
+  )
+
+// Match with tagged unions and Effects
+class Success extends Data.TaggedClass("Success")<{ data: string }> {}
+class NotFound extends Data.TaggedClass("NotFound")<{ id: string }> {}
+class ServerError extends Data.TaggedClass("ServerError")<{ code: number }> {}
+
+type ApiResponse = Success | NotFound | ServerError
+
+const handle = (response: ApiResponse) =>
+  Match.value(response).pipe(
+    Match.tag("Success", ({ data }) => Effect.succeed(data)),
+    Match.tag("NotFound", ({ id }) => Effect.fail(`Not found: ${id}`)),
+    Match.tag("ServerError", ({ code }) => Effect.fail(`Server error: ${code}`)),
+    Match.exhaustive
+  )
 ```
 
 ## Hints
 
-- Simple if-else with Effect works great
-- `Effect.when` returns `Option` - use `Effect.flatMap` if you need to unwrap
-- `Effect.unless` is the inverse of `Effect.when`
-- `filterOrFail` is useful for validation
-- You can combine multiple conditions via `Effect.gen`
+- `Effect.if` takes an Effect<boolean> as condition, not a plain boolean
+- `Effect.filterOrFail` predicate returns true to KEEP the value
+- `Match.tag` matches on `_tag` field (works with `Data.TaggedClass` and `Data.TaggedError`)
+- `Match.exhaustive` ensures ALL variants are handled at compile time
+- `Match.when` works with predicates, literals, and object patterns
+- Use `Data.TaggedClass` to create tagged union members
 
 ## Bonus
 
 Try to:
-- Create a switch-case pattern with Effect
-- Use `Effect.gen` for complex conditional logic
-- Implement a guard pattern
-- Create a validator with multiple conditions
+- Add a new variant to a union and see `Match.exhaustive` catch it
+- Use `Match.not` to match everything except a specific tag
+- Combine multiple `filterOrFail` in a pipe chain
+- Use `Match.whenOr` to handle multiple tags with the same handler

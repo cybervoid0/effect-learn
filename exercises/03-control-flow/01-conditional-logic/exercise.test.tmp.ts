@@ -1,6 +1,6 @@
 import { describe, expect, it } from "@effect/vitest"
 import { Effect, Exit } from "effect"
-import * as Exercise from "./exercise"
+import * as Exercise from "./solution"
 
 describe("01-conditional-logic", () => {
 	describe("effectIf", () => {
