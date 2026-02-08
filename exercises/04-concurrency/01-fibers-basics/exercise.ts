@@ -1,25 +1,22 @@
-import { Effect, Exit, Fiber } from "effect"
+import { Effect as E, Exit, Fiber, FiberStatus } from "effect"
 
 /**
  * TODO: Fork the given effect into a fiber,
  * then join it to retrieve the result.
  */
-export const forkAndJoin = <A, E>(
-	effect: Effect.Effect<A, E>,
-): Effect.Effect<A, E> => {
+export const forkAndJoin = <A, E>(effect: E.Effect<A, E>): E.Effect<A, E> => {
 	// Your code here
-	return Effect.succeed(undefined as A) // Replace with correct implementation
+	return E.fork(effect).pipe(E.flatMap(Fiber.join))
 }
-
 /**
  * TODO: Fork the given effect into a fiber,
  * then await it to retrieve the Exit value.
  */
 export const forkAndAwait = <A, E>(
-	effect: Effect.Effect<A, E>,
-): Effect.Effect<Exit.Exit<A, E>> => {
+	effect: E.Effect<A, E>,
+): E.Effect<Exit.Exit<A, E>> => {
 	// Your code here
-	return Effect.succeed(Exit.void) // Replace with correct implementation
+	return E.fork(effect).pipe(E.flatMap(Fiber.await))
 }
 
 /**
@@ -28,9 +25,9 @@ export const forkAndAwait = <A, E>(
  * Return true if the interruption was successful
  * (i.e. the exit is a Failure).
  */
-export const interruptFiber = (): Effect.Effect<boolean> => {
+export const interruptFiber = (): E.Effect<boolean> => {
 	// Your code here
-	return Effect.succeed(false) // Replace with correct implementation
+	return E.fork(E.never).pipe(E.flatMap(Fiber.interrupt), E.map(Exit.isFailure))
 }
 
 /**
@@ -39,11 +36,14 @@ export const interruptFiber = (): Effect.Effect<boolean> => {
  * Daemon fibers are not interrupted when the parent scope ends.
  */
 export const forkDaemons = <A, B>(
-	effectA: Effect.Effect<A>,
-	effectB: Effect.Effect<B>,
-): Effect.Effect<readonly [Fiber.RuntimeFiber<A, never>, Fiber.RuntimeFiber<B, never>]> => {
+	effectA: E.Effect<A>,
+	effectB: E.Effect<B>,
+): E.Effect<
+	readonly [Fiber.RuntimeFiber<A, never>, Fiber.RuntimeFiber<B, never>]
+> => {
 	// Your code here
-	return Effect.succeed(undefined as never) // Replace with correct implementation
+
+	return E.forkDaemon(effectA).pipe(E.zip(E.forkDaemon(effectB)))
 }
 
 /**
@@ -54,8 +54,14 @@ export const forkDaemons = <A, B>(
  * Hint: use fiber.status and FiberStatus.isRunning / FiberStatus.isSuspended
  */
 export const checkFiberStatus = (
-	effect: Effect.Effect<string>,
-): Effect.Effect<boolean> => {
+	effect: E.Effect<string>,
+): E.Effect<boolean> => {
 	// Your code here
-	return Effect.succeed(false) // Replace with correct implementation
+	return E.fork(effect).pipe(
+		E.flatMap((fib) => fib.status),
+		E.andThen(
+			(status) =>
+				FiberStatus.isRunning(status) || FiberStatus.isSuspended(status),
+		),
+	)
 }
