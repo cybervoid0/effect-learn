@@ -18,7 +18,7 @@ export const raceWithFallback = (
 	fastDelay: number,
 	slowDelay: number,
 	safeValue: string,
-): Effect.Effect<string> => {
+): Effect.Effect<string, string> => {
 	const fastButFailing = Effect.sleep(Duration.millis(fastDelay)).pipe(
 		Effect.andThen(Effect.fail("fast failed" as const)),
 	)
@@ -53,7 +53,7 @@ export const firstSuccessful = <A, E>(
  */
 export const withTimeout = <A>(
 	effect: Effect.Effect<A>,
-	duration: string,
+	duration: Duration.DurationInput,
 	fallbackValue: A,
 ): Effect.Effect<A> => {
 	return effect.pipe(
