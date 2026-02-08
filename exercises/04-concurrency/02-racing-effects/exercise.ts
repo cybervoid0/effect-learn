@@ -1,7 +1,71 @@
 import { Effect } from "effect"
 
 /**
- * TODO: Implement the exercise functions
+ * TODO: Race two effects and return the result of the faster one.
+ * Use Effect.race.
  */
+export const raceTwo = <A>(
+	first: Effect.Effect<A>,
+	second: Effect.Effect<A>,
+): Effect.Effect<A> => {
+	// Your code here
+	return Effect.succeed(undefined as A) // Replace with correct implementation
+}
 
-export const solution = Effect.succeed("TODO: Implement me!")
+/**
+ * TODO: Race a fast-but-failing effect against a slow-but-safe one.
+ * The fast effect fails after `fastDelay` ms.
+ * The slow effect succeeds with `safeValue` after `slowDelay` ms.
+ *
+ * Use Effect.race — the safe effect should win because
+ * Effect.race waits for the first SUCCESS, not the first settlement.
+ */
+export const raceWithFallback = (
+	fastDelay: number,
+	slowDelay: number,
+	safeValue: string,
+): Effect.Effect<string> => {
+	// Your code here
+	return Effect.succeed("") // Replace with correct implementation
+}
+
+/**
+ * TODO: Race all effects in the array and return the first result.
+ * Use Effect.raceAll.
+ */
+export const raceAll = <A>(
+	effects: ReadonlyArray<Effect.Effect<A>>,
+): Effect.Effect<A> => {
+	// Your code here
+	return Effect.succeed(undefined as A) // Replace with correct implementation
+}
+
+/**
+ * TODO: Try effects one by one until one succeeds.
+ * If all fail, return the last error.
+ * Use Effect.firstSuccessOf.
+ *
+ * Note: this is sequential, not concurrent!
+ */
+export const firstSuccessful = <A, E>(
+	effects: ReadonlyArray<Effect.Effect<A, E>>,
+): Effect.Effect<A, E> => {
+	// Your code here
+	return Effect.succeed(undefined as A) // Replace with correct implementation
+}
+
+/**
+ * TODO: Add a timeout to the given effect.
+ * If the effect completes in time, return its result.
+ * If it times out, return the provided `fallbackValue`.
+ *
+ * Hint: use Effect.timeout + Effect.catchTag("TimeoutException", ...)
+ */
+export const withTimeout = <A>(
+	effect: Effect.Effect<A>,
+	duration: string,
+	fallbackValue: A,
+): Effect.Effect<A> => {
+	// Your code here
+	return Effect.succeed(undefined as A) // Replace with correct implementation
+}
