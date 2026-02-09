@@ -1,4 +1,4 @@
-import { Effect, Ref, Scope } from "effect"
+import { Effect as E, Ref, type Scope } from "effect"
 
 /**
  * TODO: Attach a finalizer to the given effect using Effect.ensuring.
@@ -6,11 +6,13 @@ import { Effect, Ref, Scope } from "effect"
  * Return the original effect's result.
  */
 export const withEnsuring = (
-	effect: Effect.Effect<string>,
+	effect: E.Effect<string>,
 	log: Ref.Ref<ReadonlyArray<string>>,
-): Effect.Effect<string> => {
+): E.Effect<string> => {
 	// Your code here
-	return Effect.succeed("") // Replace with correct implementation
+	return effect.pipe(
+		E.ensuring(Ref.update(log, (arr) => [...arr, "finalized"])),
+	)
 }
 
 /**
@@ -22,9 +24,12 @@ export const withEnsuring = (
  */
 export const managedResource = (
 	log: Ref.Ref<ReadonlyArray<string>>,
-): Effect.Effect<string, never, Scope.Scope> => {
+): E.Effect<string, never, Scope.Scope> => {
 	// Your code here
-	return Effect.succeed("") // Replace with correct implementation
+	return E.acquireRelease(
+		Ref.update(log, (arr) => [...arr, "acquired"]),
+		() => Ref.update(log, (arr) => [...arr, "released"]),
+	).pipe(E.as("resource"))
 }
 
 /**
@@ -37,9 +42,15 @@ export const managedResource = (
  */
 export const scopedResource = (
 	log: Ref.Ref<ReadonlyArray<string>>,
-): Effect.Effect<string> => {
+): E.Effect<string> => {
 	// Your code here
-	return Effect.succeed("") // Replace with correct implementation
+	return E.scoped(
+		E.gen(function* () {
+			const resource = yield* managedResource(log)
+			yield* Ref.update(log, (arr) => [...arr, "used"])
+			return resource
+		}),
+	)
 }
 
 /**
@@ -50,11 +61,17 @@ export const scopedResource = (
  */
 export const addFinalizerExample = (
 	log: Ref.Ref<ReadonlyArray<string>>,
-): Effect.Effect<string> => {
+): E.Effect<string> => {
 	// Your code here
-	return Effect.succeed("") // Replace with correct implementation
+	return E.scoped(
+		E.gen(function* () {
+			yield* E.addFinalizer((exit) =>
+				Ref.update(log, (arr) => [...arr, exit._tag]),
+			)
+			return "done"
+		}),
+	)
 }
-
 /**
  * TODO: Acquire two resources (A then B) within a scope.
  * Each resource appends "acquire:X" on acquire and "release:X" on release.
@@ -62,7 +79,24 @@ export const addFinalizerExample = (
  *
  * Return the final log as an array.
  */
-export const multipleResources = (): Effect.Effect<ReadonlyArray<string>> => {
-	// Your code here
-	return Effect.succeed([]) // Replace with correct implementation
+export const multipleResources = (): E.Effect<ReadonlyArray<string>> => {
+	return E.gen(function* () {
+		const log = yield* Ref.make<ReadonlyArray<string>>([])
+
+		yield* E.scoped(
+			E.acquireRelease(
+				Ref.update(log, (arr) => [...arr, "acquire:A"]),
+				() => Ref.update(log, (arr) => [...arr, "release:A"]),
+			).pipe(
+				E.andThen(
+					E.acquireRelease(
+						Ref.update(log, (arr) => [...arr, "acquire:B"]),
+						() => Ref.update(log, (arr) => [...arr, "release:B"]),
+					),
+				),
+			),
+		)
+
+		return yield* Ref.get(log)
+	})
 }
