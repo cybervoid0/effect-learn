@@ -8,7 +8,7 @@ export const parallelAll = <A>(
 	effects: ReadonlyArray<Effect.Effect<A>>,
 ): Effect.Effect<Array<A>> => {
 	// Your code here
-	return Effect.succeed([]) // Replace with correct implementation
+	return Effect.all(effects, { concurrency: "unbounded" }) // Replace with correct implementation
 }
 
 /**
@@ -20,7 +20,7 @@ export const parallelWithLimit = <A>(
 	limit: number,
 ): Effect.Effect<Array<A>> => {
 	// Your code here
-	return Effect.succeed([]) // Replace with correct implementation
+	return Effect.all(effects, { concurrency: limit }) // Replace with correct implementation
 }
 
 /**
@@ -34,7 +34,7 @@ export const parallelForEach = <A, B>(
 	concurrency: number,
 ): Effect.Effect<Array<B>> => {
 	// Your code here
-	return Effect.succeed([]) // Replace with correct implementation
+	return Effect.forEach(items, fn, { concurrency })
 }
 
 /**
@@ -46,9 +46,12 @@ export const parallelForEach = <A, B>(
  */
 export const validateAll = <A, E>(
 	effects: ReadonlyArray<Effect.Effect<A, E>>,
-): Effect.Effect<Array<A>, Array<E>> => {
+) => {
 	// Your code here
-	return Effect.succeed([]) // Replace with correct implementation
+	return Effect.all(effects, {
+		concurrency: "unbounded",
+		mode: "validate",
+	})
 }
 
 /**
@@ -63,7 +66,16 @@ export const validateAll = <A, E>(
  */
 export const measureSpeedup = (
 	effects: ReadonlyArray<Effect.Effect<void>>,
-): Effect.Effect<{ sequential: number; parallel: number }> => {
-	// Your code here
-	return Effect.succeed({ sequential: 0, parallel: 0 }) // Replace with correct implementation
-}
+): Effect.Effect<{ sequential: number; parallel: number }> =>
+	Effect.gen(function* () {
+		const [d1] = yield* Effect.timed(Effect.all(effects))
+		const [d2] = yield* Effect.timed(
+			Effect.all(effects, { concurrency: "unbounded" }),
+		)
+		const sequential = Duration.toMillis(d1)
+		const parallel = Duration.toMillis(d2)
+		return {
+			sequential,
+			parallel,
+		}
+	})
