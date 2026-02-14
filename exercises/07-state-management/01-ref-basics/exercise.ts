@@ -1,7 +1,43 @@
-import { Effect } from "effect"
+import { Effect, Ref } from "effect"
 
 /**
- * TODO: Implement the exercise functions
+ * TODO: Create a Ref initialized to 0, then read and return the value.
+ *
+ * Hint: Use Ref.make to create, Ref.get to read.
  */
+export const createAndGet: Effect.Effect<number> = Effect.succeed(0) // Replace with correct implementation
 
-export const solution = Effect.succeed("TODO: Implement me!")
+/**
+ * TODO: Create a Ref initialized to 0, set it to 42, then read and return.
+ *
+ * Hint: Use Ref.make, Ref.set, and Ref.get.
+ */
+export const setAndGet: Effect.Effect<number> = Effect.succeed(0) // Replace with correct implementation
+
+/**
+ * TODO: Create a Ref initialized to 10, use Ref.updateAndGet to add 5.
+ * Return the result of updateAndGet.
+ *
+ * Hint: Ref.updateAndGet applies a function and returns the new value.
+ */
+export const updateRef: Effect.Effect<number> = Effect.succeed(0) // Replace with correct implementation
+
+/**
+ * TODO: Create a Ref initialized to "hello".
+ * Use Ref.modify to return the string's length and store the uppercased string.
+ *
+ * Hint: Ref.modify takes a function that returns [returnValue, newState].
+ */
+export const modifyRef: Effect.Effect<number> = Effect.succeed(0) // Replace with correct implementation
+
+/**
+ * TODO: Create a Ref initialized to 0.
+ * Increment it n times using Effect.forEach over Array.from({ length: n }).
+ * Return the final value.
+ *
+ * Hint: Use Ref.update inside Effect.forEach, then Ref.get at the end.
+ */
+export const counter = (n: number): Effect.Effect<number> => {
+	// Your code here
+	return Effect.succeed(0) // Replace with correct implementation
+}
