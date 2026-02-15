@@ -1,85 +1,90 @@
-import { Context, Effect } from "effect"
+import { Context, Data, Effect, type Either } from "effect"
 
-export class RandomService extends Context.Tag("RandomService")<
-	RandomService,
-	{ readonly next: Effect.Effect<number> }
->() {}
+// Types and services
 
-export class LoggerService extends Context.Tag("LoggerService")<
-	LoggerService,
-	{ readonly log: (message: string) => Effect.Effect<void> }
->() {}
+export type User = { readonly id: string; readonly name: string }
 
-export class UserRepository extends Context.Tag("UserRepository")<
-	UserRepository,
+export class UserNotFound extends Data.TaggedError("UserNotFound")<{
+	readonly id: string
+}> {}
+
+export class Logger extends Context.Tag("Logger")<
+	Logger,
 	{
-		readonly getUser: (id: number) => Effect.Effect<string, Error>
+		readonly info: (msg: string) => Effect.Effect<void>
+		readonly error: (msg: string) => Effect.Effect<void>
 	}
 >() {}
 
-/**
- * Use RandomService to get a random number
- */
-export const getRandomValue: Effect.Effect<
-	number,
-	never,
-	RandomService
-> = Effect.gen(function* () {
-	const random = yield* RandomService
-	return yield* random.next
-})
+export class UserRepo extends Context.Tag("UserRepo")<
+	UserRepo,
+	{
+		readonly findById: (
+			id: string,
+		) => Effect.Effect<User, UserNotFound>
+		readonly save: (user: User) => Effect.Effect<void>
+	}
+>() {}
 
-/**
- * Log "hello" using LoggerService, then return "done"
- */
-export const logAndReturn: Effect.Effect<
-	string,
-	never,
-	LoggerService
-> = Effect.gen(function* () {
-	const logger = yield* LoggerService
-	yield* logger.log("hello")
-	return "done"
-})
+// Exercise 1: Find user with logging
+export const loggedFind = (
+	id: string,
+): Effect.Effect<User, UserNotFound, Logger | UserRepo> =>
+	Effect.gen(function* () {
+		const logger = yield* Logger
+		const userRepo = yield* UserRepo
+		yield* logger.info(`looking up: ${id}`)
+		return yield* userRepo.findById(id)
+	})
 
-/**
- * Get user by id, return "Unknown" on error
- */
-export const getUserOrFallback = (
-	id: number,
-): Effect.Effect<string, never, UserRepository> => {
-	return Effect.gen(function* () {
-		const repo = yield* UserRepository
-		return yield* repo.getUser(id).pipe(
-			Effect.catchAll(() => Effect.succeed("Unknown")),
+// Exercise 2: Find or create user
+export const findOrCreate = (
+	id: string,
+	name: string,
+): Effect.Effect<User, never, Logger | UserRepo> =>
+	Effect.gen(function* () {
+		const logger = yield* Logger
+		const userRepo = yield* UserRepo
+		return yield* userRepo.findById(id).pipe(
+			Effect.catchTag("UserNotFound", () =>
+				Effect.gen(function* () {
+					const user: User = { id, name }
+					yield* userRepo.save(user)
+					yield* logger.info(`created: ${id}`)
+					return user
+				}),
+			),
 		)
 	})
-}
 
-/**
- * Use RandomService + LoggerService together
- */
-export const multiServiceProgram: Effect.Effect<
-	number,
-	never,
-	RandomService | LoggerService
-> = Effect.gen(function* () {
-	const random = yield* RandomService
-	const logger = yield* LoggerService
-	const value = yield* random.next
-	yield* logger.log(String(value))
-	return value
-})
+// Exercise 3: Rename a user
+export const renameUser = (
+	id: string,
+	newName: string,
+): Effect.Effect<User, UserNotFound, Logger | UserRepo> =>
+	Effect.gen(function* () {
+		const logger = yield* Logger
+		const userRepo = yield* UserRepo
+		const existing = yield* userRepo.findById(id)
+		const updated: User = { ...existing, name: newName }
+		yield* userRepo.save(updated)
+		yield* logger.info(`renamed: ${id}`)
+		return updated
+	})
 
-/**
- * Get random value, multiply by 100, round to integer
- */
-export const serviceWithMapping: Effect.Effect<
-	number,
+// Exercise 4: Batch lookup
+export const batchLookup = (
+	ids: ReadonlyArray<string>,
+): Effect.Effect<
+	Array<Either.Either<User, UserNotFound>>,
 	never,
-	RandomService
-> = Effect.gen(function* () {
-	const random = yield* RandomService
-	const value = yield* random.next
-	return Math.round(value * 100)
-})
+	Logger | UserRepo
+> =>
+	Effect.gen(function* () {
+		const logger = yield* Logger
+		const userRepo = yield* UserRepo
+		yield* logger.info(`batch: ${ids.length} ids`)
+		return yield* Effect.forEach(ids, (id) =>
+			Effect.either(userRepo.findById(id)),
+		)
+	})

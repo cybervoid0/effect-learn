@@ -1,69 +1,84 @@
 import { Context, Effect, Layer } from "effect"
 
-// -- Service definitions --
+// ============================================================
+// Define the three services
+// ============================================================
 
-export class ConfigService extends Context.Tag("ConfigService")<
-	ConfigService,
-	{ readonly host: string; readonly port: number }
+// TODO: Define AppConfig service tag ("AppConfig") with:
+//   dbUrl:      string
+//   maxRetries: number
+
+export class AppConfig extends Context.Tag("AppConfig")<
+	AppConfig,
+	Record<string, never> // <-- Replace with real interface
 >() {}
 
-export class DbService extends Context.Tag("DbService")<
-	DbService,
-	{ readonly query: (sql: string) => Effect.Effect<string> }
+// TODO: Define Database service tag ("Database") with:
+//   query: (sql: string) => Effect.Effect<string>
+
+export class Database extends Context.Tag("Database")<
+	Database,
+	Record<string, never> // <-- Replace with real interface
 >() {}
 
-export class LoggerService extends Context.Tag("LoggerService")<
-	LoggerService,
-	{ readonly log: (msg: string) => Effect.Effect<void> }
+// TODO: Define UserService service tag ("UserService") with:
+//   getUser: (id: string) => Effect.Effect<string>
+
+export class UserService extends Context.Tag("UserService")<
+	UserService,
+	Record<string, never> // <-- Replace with real interface
 >() {}
 
-// -- Provided for you --
+// ============================================================
+// Exercise 1: Config layer (no dependencies)
+// ============================================================
 
-export const loggerLayer: Layer.Layer<LoggerService> = Layer.succeed(
-	LoggerService,
-	{ log: () => Effect.void },
-)
+// Create a Layer.succeed with:
+//   dbUrl: "postgres://localhost"
+//   maxRetries: 3
+export const configLayer: Layer.Layer<AppConfig> =
+	Layer.succeed(AppConfig, {} as never) // <-- Replace
 
-// -- Exercises --
+// ============================================================
+// Exercise 2: Database layer (depends on AppConfig)
+// ============================================================
 
-/**
- * TODO: Create a Layer.succeed for ConfigService.
- * Use host: "localhost" and port: 3000.
- */
-export const configLayer: Layer.Layer<ConfigService> = Layer.succeed(
-	ConfigService,
-	{ host: "", port: 0 }, // Replace with correct values
-)
+// Use Layer.effect + Effect.gen to:
+// 1. yield* AppConfig to get config
+// 2. Return implementation where query(sql) returns:
+//    Effect.succeed(`[${config.dbUrl}] result: ${sql}`)
+export const databaseLayer: Layer.Layer<Database, never, AppConfig> =
+	Layer.succeed(Database, {} as never) as never // <-- Replace with Layer.effect(...)
 
-/**
- * TODO: Create a Layer.effect for DbService that reads ConfigService
- * to construct the query method.
- * query(sql) should return `"${host}:${port} > ${sql}"`.
- */
-export const dbLayer: Layer.Layer<DbService, never, ConfigService> =
-	Layer.succeed(DbService, {
-		query: () => Effect.succeed(""), // Replace with Layer.effect implementation
-	})
+// ============================================================
+// Exercise 3: UserService layer (depends on Database)
+// ============================================================
 
-/**
- * TODO: Merge configLayer and loggerLayer into a single layer
- * that provides both ConfigService and LoggerService.
- */
-export const mergedLayer: Layer.Layer<ConfigService | LoggerService> =
-	configLayer // Replace with Layer.merge
+// Use Layer.effect + Effect.gen to:
+// 1. yield* Database to get db
+// 2. Return implementation where getUser(id) calls:
+//    db.query(`SELECT * FROM users WHERE id = '${id}'`)
+export const userServiceLayer: Layer.Layer<
+	UserService,
+	never,
+	Database
+> = Layer.succeed(UserService, {} as never) as never // <-- Replace with Layer.effect(...)
 
-/**
- * TODO: Create an Effect that reads host and port from ConfigService,
- * returns them as a string "host:port".
- * Then provide configLayer so the effect has no remaining requirements.
- */
-export const providedProgram: Effect.Effect<string> = Effect.succeed("") // Replace
+// ============================================================
+// Exercise 4: Resolve database dependencies
+// ============================================================
 
-/**
- * TODO: Build a full stack:
- * 1. configLayer feeds into dbLayer (use Layer.provide)
- * 2. Merge the result with loggerLayer
- * 3. Create a program that uses DbService to query "SELECT 1"
- * 4. Provide the full layer to the program
- */
-export const fullStack: Effect.Effect<string> = Effect.succeed("") // Replace
+// Provide configLayer to databaseLayer to eliminate AppConfig requirement
+export const resolvedDatabaseLayer: Layer.Layer<Database> =
+	databaseLayer as never // <-- Replace with Layer.provide(...)
+
+// ============================================================
+// Exercise 5: Full application layer
+// ============================================================
+
+// Compose everything into a single layer that provides
+// AppConfig, Database, AND UserService — with NO requirements.
+// Hint: you need to merge layers and resolve all dependencies
+export const fullAppLayer: Layer.Layer<
+	AppConfig | Database | UserService
+> = configLayer as never // <-- Replace with proper composition

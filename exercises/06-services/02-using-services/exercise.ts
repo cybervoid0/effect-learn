@@ -1,71 +1,99 @@
-import { Context, Effect } from "effect"
+import { Context, Data, Effect, Either } from "effect"
 
-// -- Service definitions (provided for you) --
+// ============================================================
+// Define types and services
+// ============================================================
 
-export class RandomService extends Context.Tag("RandomService")<
-	RandomService,
-	{ readonly next: Effect.Effect<number> }
+// TODO: Define User type (id: string, name: string)
+
+// TODO: Define UserNotFound tagged error with an `id` field
+
+// TODO: Define Logger service tag ("Logger") with:
+//   info:  (msg: string) => Effect.Effect<void>
+//   error: (msg: string) => Effect.Effect<void>
+
+// TODO: Define UserRepo service tag ("UserRepo") with:
+//   findById: (id: string) => Effect.Effect<User, UserNotFound>
+//   save:     (user: User) => Effect.Effect<void>
+
+// Placeholder exports — replace with real definitions
+export type User = { readonly id: string; readonly name: string }
+
+export class UserNotFound extends Data.TaggedError("UserNotFound")<{
+	readonly id: string
+}> {}
+
+export class Logger extends Context.Tag("Logger")<
+	Logger,
+	Record<string, never> // <-- Replace with real interface
 >() {}
 
-export class LoggerService extends Context.Tag("LoggerService")<
-	LoggerService,
-	{ readonly log: (message: string) => Effect.Effect<void> }
+export class UserRepo extends Context.Tag("UserRepo")<
+	UserRepo,
+	Record<string, never> // <-- Replace with real interface
 >() {}
 
-export class UserRepository extends Context.Tag("UserRepository")<
-	UserRepository,
-	{
-		readonly getUser: (id: number) => Effect.Effect<string, Error>
-	}
->() {}
+// ============================================================
+// Exercise 1: Find user with logging
+// ============================================================
 
-// -- Exercises --
-
-/**
- * TODO: Use RandomService to get a random number and return it.
- */
-export const getRandomValue: Effect.Effect<
-	number,
-	never,
-	RandomService
-> = Effect.succeed(0) // Replace with correct implementation
-
-/**
- * TODO: Use LoggerService to log "hello", then return the string "done".
- */
-export const logAndReturn: Effect.Effect<
-	string,
-	never,
-	LoggerService
-> = Effect.succeed("") // Replace with correct implementation
-
-/**
- * TODO: Use UserRepository.getUser(id) and catch any error
- * to return "Unknown" instead.
- */
-export const getUserOrFallback = (
-	id: number,
-): Effect.Effect<string, never, UserRepository> => {
-	return Effect.succeed("") // Replace with correct implementation
+// Look up a user by id. Before the lookup, log "looking up: <id>"
+// using logger.info. Return the found user.
+export const loggedFind = (
+	id: string,
+): Effect.Effect<User, UserNotFound, Logger | UserRepo> => {
+	// Your code here
+	return Effect.succeed({ id: "", name: "" }) as never
 }
 
-/**
- * TODO: Use both RandomService and LoggerService:
- * 1. Get a random value
- * 2. Log it as a string
- * 3. Return the value
- */
-export const multiServiceProgram: Effect.Effect<
-	number,
-	never,
-	RandomService | LoggerService
-> = Effect.succeed(0) // Replace with correct implementation
+// ============================================================
+// Exercise 2: Find or create user
+// ============================================================
 
-/**
- * TODO: Get a random value, multiply by 100, round to integer.
- */
-export const serviceWithMapping: Effect.Effect<
-	number,
+// Try to find user by id. If UserNotFound:
+// 1. Create User { id, name }
+// 2. Save the new user via userRepo.save
+// 3. Log "created: <id>" via logger.info
+// 4. Return the new user
+export const findOrCreate = (
+	id: string,
+	name: string,
+): Effect.Effect<User, never, Logger | UserRepo> => {
+	// Your code here
+	return Effect.succeed({ id: "", name: "" }) as never
+}
+
+// ============================================================
+// Exercise 3: Rename a user
+// ============================================================
+
+// 1. Find user by id
+// 2. Create new user object with the updated name
+// 3. Save the updated user
+// 4. Log "renamed: <id>" via logger.info
+// 5. Return the updated user
+export const renameUser = (
+	id: string,
+	newName: string,
+): Effect.Effect<User, UserNotFound, Logger | UserRepo> => {
+	// Your code here
+	return Effect.succeed({ id: "", name: "" }) as never
+}
+
+// ============================================================
+// Exercise 4: Batch lookup with Either results
+// ============================================================
+
+// 1. Log "batch: <count> ids" via logger.info (where count = ids.length)
+// 2. For each id, look up the user and wrap in Effect.either
+// 3. Return Array<Either<User, UserNotFound>>
+export const batchLookup = (
+	ids: ReadonlyArray<string>,
+): Effect.Effect<
+	Array<Either.Either<User, UserNotFound>>,
 	never,
-	RandomService
-> = Effect.succeed(0) // Replace with correct implementation
+	Logger | UserRepo
+> => {
+	// Your code here
+	return Effect.succeed([]) as never
+}

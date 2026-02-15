@@ -1,101 +1,106 @@
-# Using Services
+# Using Services — Composition & Patterns
 
 ## Concept
 
-Once a service is defined with `Context.Tag`, you can **use** it inside `Effect.gen`
-by simply yielding the tag. This gives you the service implementation, which you
-can then call like any other value.
+Once you know how to define services, the real power comes from **composing**
+them. In real applications a program rarely needs just one service — it
+orchestrates several together.
 
-### Accessing a service
-
-```typescript
-const program = Effect.gen(function* () {
-  const random = yield* RandomService  // Accesses the service
-  const value = yield* random.next     // Calls a method on it
-  return value
-})
-```
-
-The resulting effect has `RandomService` in its `R` (requirements) type parameter,
-meaning it cannot be run until the service is provided.
-
-### Combining multiple services
-
-You can use as many services as you need in a single `Effect.gen` block:
+### Accessing multiple services
 
 ```typescript
 const program = Effect.gen(function* () {
-  const random = yield* RandomService
+  const db = yield* DbService
   const logger = yield* LoggerService
-  const value = yield* random.next
-  yield* logger.log(`Got: ${value}`)
-  return value
+  yield* logger.info("Fetching user...")
+  return yield* db.findUser("123")
 })
-// Effect.Effect<number, never, RandomService | LoggerService>
+// Type: Effect<User, DbError, DbService | LoggerService>
+//                              ^^^^^^^^^^^^^^^^^^^^^^^^
+//                              Both services are tracked!
 ```
 
-The `R` type is a **union** of all required services.
+### Service functions — wrapping access
 
-### Providing services
-
-Use `Effect.provide` with layers or `Layer.merge` for multiple services:
+A common pattern is to create helper functions that hide the `yield*`:
 
 ```typescript
-const runnable = program.pipe(
-  Effect.provide(Layer.merge(randomLive, loggerLive))
-)
+const findUser = (id: string) =>
+  Effect.gen(function* () {
+    const db = yield* DbService
+    return yield* db.findUser(id)
+  })
+```
+
+Or using `Effect.andThen` / `Effect.flatMap` for one-liners:
+
+```typescript
+const findUser = (id: string) =>
+  DbService.pipe(Effect.andThen((db) => db.findUser(id)))
+```
+
+### Error recovery with services
+
+Services naturally integrate with Effect's error channel:
+
+```typescript
+const safeFind = (id: string) =>
+  findUser(id).pipe(
+    Effect.catchTag("UserNotFound", () => Effect.succeed(defaultUser))
+  )
 ```
 
 ## Assignment
 
-Implement the following functions in `exercise.ts`:
+Build a logging + user-management system with two services.
 
-1. **getRandomValue** - Use RandomService to get a random number
-2. **logAndReturn** - Log "hello" using LoggerService, then return "done"
-3. **getUserOrFallback** - Get user by id from UserRepository, return "Unknown" on error
-4. **multiServiceProgram** - Use RandomService and LoggerService together: get random, log it, return it
-5. **serviceWithMapping** - Get random value, multiply by 100, round to integer
+### Services (define them yourself):
+
+**Logger** — tag `"Logger"`:
+- `info: (msg: string) => Effect.Effect<void>`
+- `error: (msg: string) => Effect.Effect<void>`
+
+**UserRepo** — tag `"UserRepo"`:
+- `findById: (id: string) => Effect.Effect<User, UserNotFound>`
+- `save: (user: User) => Effect.Effect<void>`
+
+### Types (define them yourself):
+
+- `User` — `{ readonly id: string; readonly name: string }`
+- `UserNotFound` — tagged error with `id: string` field
+
+### Tasks:
+
+1. **loggedFind** — find a user by id. Log `"looking up: <id>"` before
+   the lookup using `logger.info`. Return the user.
+
+2. **findOrCreate** — try to find user by id. If `UserNotFound`,
+   create a new `User` with the given `id` and `name`, save it,
+   log `"created: <id>"` with `logger.info`, and return the new user.
+
+3. **renameUser** — find user by id, create a new user object with
+   updated name, save it, log `"renamed: <id>"` with `logger.info`,
+   return the updated user.
+
+4. **batchLookup** — given an array of ids, look up each user.
+   Collect results as `Array<Either<User, UserNotFound>>` using
+   `Effect.either`. The logger should log `"batch: <count> ids"` once
+   at the start.
+
+## Hints
+
+- All tasks require both `Logger` and `UserRepo` in the `R` channel
+- Use `Effect.gen` to access services
+- `Data.TaggedError` for `UserNotFound`
+- For `batchLookup`, use `Effect.forEach` + `Effect.either`
+- `Either.right` contains success, `Either.left` contains the error
 
 ## Examples
 
 ```typescript
-import { Effect } from "effect"
-
-// Single service
-const getValue = Effect.gen(function* () {
-  const svc = yield* MyService
-  return yield* svc.getValue()
-})
-
-// Error recovery
-const safe = Effect.gen(function* () {
-  const repo = yield* UserRepo
-  return yield* repo.find(id).pipe(
-    Effect.catchAll(() => Effect.succeed("fallback"))
-  )
-})
-
-// Multiple services
-const combined = Effect.gen(function* () {
-  const a = yield* ServiceA
-  const b = yield* ServiceB
-  const x = yield* a.compute()
-  yield* b.record(x)
-  return x
+// Test layer creation pattern:
+const TestLogger = Layer.succeed(Logger, {
+  info: (msg) => Ref.update(log, (arr) => [...arr, `INFO: ${msg}`]),
+  error: (msg) => Ref.update(log, (arr) => [...arr, `ERROR: ${msg}`]),
 })
 ```
-
-## Hints
-
-- Yield the tag to get the service: `const svc = yield* MyService`
-- Use `Effect.catchAll` to recover from errors in service calls
-- `Effect.map` or `Effect.andThen` can transform results
-- Multiple services create a union type in `R`
-- `Math.round(x)` rounds a number to the nearest integer
-
-## Bonus
-
-Try to:
-- Chain three or more services in a single generator
-- Use `Effect.tap` to log without changing the return value
-- Create a service method that calls another service internally

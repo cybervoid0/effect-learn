@@ -1,111 +1,118 @@
-# Layers
+# Layers — Composing Dependencies
 
 ## Concept
 
-A **Layer** is a recipe for building a service. Layers describe how to construct
-service implementations, what dependencies they need, and how to compose them
-together into a complete application.
+Layers are recipes for building services. The real power is that layers can
+**depend on other layers**, forming a dependency graph that Effect resolves
+automatically.
 
-### `Layer.succeed` - Constant layer
+### Layer types
 
-Creates a layer from a plain value (no effects during construction):
-
-```typescript
-const ConfigLive = Layer.succeed(ConfigService, {
-  host: "localhost",
-  port: 8080,
-})
+```
+Layer<Out, Error, In>
+       ↑    ↑     ↑
+       |    |     └── Services needed to build this layer
+       |    └── Errors that can occur during construction
+       └── Services this layer provides
 ```
 
-### `Layer.effect` - Effectful layer
-
-Creates a layer using an Effect (useful when construction needs side effects):
+### Construction patterns
 
 ```typescript
-const DbLive = Layer.effect(
-  DbService,
-  Effect.gen(function* () {
-    const config = yield* ConfigService
-    return { query: (sql: string) => Effect.succeed(`${config.host}: ${sql}`) }
-  })
-)
+// Simple: no dependencies, no effects
+Layer.succeed(MyService, implementation)
+
+// Effectful: can use Effects during construction (e.g. create Ref)
+Layer.effect(MyService, Effect.gen(function* () {
+  const state = yield* Ref.make(0)
+  return { /* impl using state */ }
+}))
+
+// Dependent: needs another service to build
+Layer.effect(DbService, Effect.gen(function* () {
+  const config = yield* ConfigService  // Depends on ConfigService!
+  return { query: (sql) => /* use config.connectionString */ }
+}))
+// Type: Layer<DbService, never, ConfigService>
+//                                ^^^^^^^^^^^^
 ```
 
-### `Layer.merge` - Combine independent layers
-
-Merges two layers that provide different services:
+### Composition operators
 
 ```typescript
-const AppLayer = Layer.merge(ConfigLive, LoggerLive)
-// Layer providing ConfigService & LoggerService
-```
+// Merge — combine independent layers (both provided)
+const AppLayer = Layer.merge(LoggerLayer, ConfigLayer)
+// Type: Layer<Logger | Config, never, never>
 
-### `Layer.provide` - Feed dependencies
+// Provide — satisfy a layer's dependency
+// If DbLayer needs Config, and ConfigLayer provides Config:
+const ResolvedDbLayer = Layer.provide(DbLayer, ConfigLayer)
+// Type: Layer<DbService, never, never>  ← Config requirement eliminated
 
-When layer B depends on service A, provide A's layer to B:
-
-```typescript
-const DbLive = Layer.provide(DbLayer, ConfigLive)
-// DbLayer gets its ConfigService from ConfigLive
-```
-
-### `Effect.provide` - Provide layer to a program
-
-```typescript
-const runnable = program.pipe(Effect.provide(AppLayer))
+// MergeAll — merge many layers
+const FullStack = Layer.mergeAll(LoggerLayer, ConfigLayer, ResolvedDbLayer)
 ```
 
 ## Assignment
 
-Implement the following in `exercise.ts`:
+Build a 3-tier application stack: Config → Database → UserService.
 
-1. **ConfigService + configLayer** - Define a config service and create a `Layer.succeed`
-2. **DbService + dbLayer** - Define a DB service and create a `Layer.effect` that uses ConfigService
-3. **mergedLayer** - Merge configLayer with a provided loggerLayer using `Layer.merge`
-4. **providedProgram** - An Effect that reads ConfigService, fully provided with configLayer
-5. **fullStack** - Compose: configLayer feeds into dbLayer, merge with loggerLayer, provide to a program
+### Define these services:
+
+**AppConfig** — tag `"AppConfig"`:
+- `dbUrl: string`
+- `maxRetries: number`
+
+**Database** — tag `"Database"`:
+- `query: (sql: string) => Effect.Effect<string>`
+
+**UserService** — tag `"UserService"`:
+- `getUser: (id: string) => Effect.Effect<string>`
+
+### Tasks:
+
+1. **configLayer** — `Layer<AppConfig>` using `Layer.succeed` with
+   `dbUrl: "postgres://localhost"`, `maxRetries: 3`
+
+2. **databaseLayer** — `Layer<Database, never, AppConfig>` using `Layer.effect`.
+   Access `AppConfig` to read `dbUrl`. Implement `query` as:
+   `Effect.succeed(\`[\${dbUrl}] result: \${sql}\`)`
+
+3. **userServiceLayer** — `Layer<UserService, never, Database>` using `Layer.effect`.
+   Access `Database`. Implement `getUser` as:
+   `db.query(\`SELECT * FROM users WHERE id = '\${id}'\`)`
+
+4. **resolvedDatabaseLayer** — Provide `configLayer` to `databaseLayer`
+   so it becomes `Layer<Database>` (no more `AppConfig` requirement)
+
+5. **fullAppLayer** — Compose everything into a single
+   `Layer<AppConfig | Database | UserService>` that has NO requirements.
+   All three services available, fully resolved.
+
+## Hints
+
+- `Layer.effect(Tag, Effect.gen(...))` — when the layer needs to access
+  another service during construction
+- `Layer.provide(layerThatNeeds, layerThatProvides)` — wires dependencies
+- `Layer.merge` / `Layer.mergeAll` — combines independent layers
+- To expose ALL three services, you need to merge the individual layers
+  after resolving their dependencies
+- Think about the dependency graph:
+  ```
+  ConfigLayer ──→ DatabaseLayer ──→ UserServiceLayer
+  ```
 
 ## Examples
 
 ```typescript
-import { Context, Effect, Layer } from "effect"
-
-class Foo extends Context.Tag("Foo")<Foo, { readonly value: string }>() {}
-class Bar extends Context.Tag("Bar")<Bar, { readonly greet: Effect.Effect<string> }>() {}
-
-const FooLive = Layer.succeed(Foo, { value: "hello" })
-
-const BarLive = Layer.effect(
-  Bar,
-  Effect.gen(function* () {
-    const foo = yield* Foo
-    return { greet: Effect.succeed(`${foo.value} world`) }
-  })
-)
-
-// Compose: Bar needs Foo, so provide FooLive to BarLive
-const BarProvided = Layer.provide(BarLive, FooLive)
-
+// Verifying the full stack works:
 const program = Effect.gen(function* () {
-  const bar = yield* Bar
-  return yield* bar.greet
+  const userService = yield* UserService
+  return yield* userService.getUser("42")
 })
 
-Effect.runPromise(program.pipe(Effect.provide(BarProvided)))
+const result = await Effect.runPromise(
+  program.pipe(Effect.provide(fullAppLayer))
+)
+// result: "[postgres://localhost] result: SELECT * FROM users WHERE id = '42'"
 ```
-
-## Hints
-
-- `Layer.succeed(Tag, value)` creates a layer with no dependencies
-- `Layer.effect(Tag, effectThatReturnsValue)` can access other services during construction
-- `Layer.merge(a, b)` combines two independent layers
-- `Layer.provide(consumer, dependency)` wires dependency into consumer
-- `Effect.provide(layer)` eliminates the `R` requirement from an Effect
-
-## Bonus
-
-Try to:
-- Create a three-layer dependency chain (A -> B -> C)
-- Use `Layer.provideMerge` to provide and keep the dependency available
-- Build a layer that acquires a resource with `Layer.scoped`
-- Use `Layer.fresh` to prevent layer sharing

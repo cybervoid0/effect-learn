@@ -1,72 +1,81 @@
 import { Context, Effect, Layer } from "effect"
 
-export class ConfigService extends Context.Tag("ConfigService")<
-	ConfigService,
-	{ readonly host: string; readonly port: number }
+// Service definitions
+
+export class AppConfig extends Context.Tag("AppConfig")<
+	AppConfig,
+	{
+		readonly dbUrl: string
+		readonly maxRetries: number
+	}
 >() {}
 
-export class DbService extends Context.Tag("DbService")<
-	DbService,
-	{ readonly query: (sql: string) => Effect.Effect<string> }
+export class Database extends Context.Tag("Database")<
+	Database,
+	{
+		readonly query: (sql: string) => Effect.Effect<string>
+	}
 >() {}
 
-export class LoggerService extends Context.Tag("LoggerService")<
-	LoggerService,
-	{ readonly log: (msg: string) => Effect.Effect<void> }
+export class UserService extends Context.Tag("UserService")<
+	UserService,
+	{
+		readonly getUser: (id: string) => Effect.Effect<string>
+	}
 >() {}
 
-export const loggerLayer: Layer.Layer<LoggerService> = Layer.succeed(
-	LoggerService,
-	{ log: () => Effect.void },
+// Exercise 1: Config layer
+export const configLayer: Layer.Layer<AppConfig> = Layer.succeed(
+	AppConfig,
+	{
+		dbUrl: "postgres://localhost",
+		maxRetries: 3,
+	},
 )
 
-/**
- * Simple config layer
- */
-export const configLayer: Layer.Layer<ConfigService> = Layer.succeed(
-	ConfigService,
-	{ host: "localhost", port: 3000 },
-)
-
-/**
- * DB layer that depends on ConfigService
- */
-export const dbLayer: Layer.Layer<DbService, never, ConfigService> =
+// Exercise 2: Database layer (depends on AppConfig)
+export const databaseLayer: Layer.Layer<Database, never, AppConfig> =
 	Layer.effect(
-		DbService,
+		Database,
 		Effect.gen(function* () {
-			const config = yield* ConfigService
+			const config = yield* AppConfig
 			return {
 				query: (sql: string) =>
-					Effect.succeed(`${config.host}:${config.port} > ${sql}`),
+					Effect.succeed(`[${config.dbUrl}] result: ${sql}`),
 			}
 		}),
 	)
 
-/**
- * Merged layer providing both Config and Logger
- */
-export const mergedLayer: Layer.Layer<ConfigService | LoggerService> =
-	Layer.merge(configLayer, loggerLayer)
+// Exercise 3: UserService layer (depends on Database)
+export const userServiceLayer: Layer.Layer<
+	UserService,
+	never,
+	Database
+> = Layer.effect(
+	UserService,
+	Effect.gen(function* () {
+		const db = yield* Database
+		return {
+			getUser: (id: string) =>
+				db.query(`SELECT * FROM users WHERE id = '${id}'`),
+		}
+	}),
+)
 
-/**
- * Program fully provided with configLayer
- */
-export const providedProgram: Effect.Effect<string> = Effect.gen(
-	function* () {
-		const config = yield* ConfigService
-		return `${config.host}:${config.port}`
-	},
-).pipe(Effect.provide(configLayer))
+// Exercise 4: Resolve database dependencies
+export const resolvedDatabaseLayer: Layer.Layer<Database> = Layer.provide(
+	databaseLayer,
+	configLayer,
+)
 
-/**
- * Full stack: config -> db, merged with logger
- */
-export const fullStack: Effect.Effect<string> = Effect.gen(function* () {
-	const db = yield* DbService
-	return yield* db.query("SELECT 1")
-}).pipe(
-	Effect.provide(
-		Layer.merge(Layer.provide(dbLayer, configLayer), loggerLayer),
+// Exercise 5: Full application layer
+export const fullAppLayer: Layer.Layer<
+	AppConfig | Database | UserService
+> = Layer.mergeAll(
+	configLayer,
+	Layer.provide(databaseLayer, configLayer),
+	Layer.provide(
+		userServiceLayer,
+		Layer.provide(databaseLayer, configLayer),
 	),
 )

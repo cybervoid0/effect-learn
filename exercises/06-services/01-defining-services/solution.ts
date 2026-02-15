@@ -1,48 +1,73 @@
-import { Context, Effect, Layer } from "effect"
+import { Context, Data, Effect, HashMap, Layer, Option, Ref } from "effect"
 
-/**
- * Service tag for random number generation
- */
-export class RandomService extends Context.Tag("RandomService")<
-	RandomService,
-	{ readonly next: Effect.Effect<number> }
->() {}
+// Exercise 1: Tagged error with key field
+export class KeyNotFoundError extends Data.TaggedError(
+	"KeyNotFoundError",
+)<{
+	readonly key: string
+}> {}
 
-/**
- * Service tag for logging
- */
-export class LoggerService extends Context.Tag("LoggerService")<
-	LoggerService,
-	{ readonly log: (message: string) => Effect.Effect<void> }
->() {}
-
-/**
- * Service tag for user management
- */
-export class UserRepository extends Context.Tag("UserRepository")<
-	UserRepository,
+// Exercise 2: KeyValueStore service tag
+export class KeyValueStore extends Context.Tag("KeyValueStore")<
+	KeyValueStore,
 	{
-		readonly getUser: (id: number) => Effect.Effect<string, Error>
-		readonly getAllUsers: Effect.Effect<string[]>
+		readonly get: (
+			key: string,
+		) => Effect.Effect<string, KeyNotFoundError>
+		readonly set: (
+			key: string,
+			value: string,
+		) => Effect.Effect<void>
+		readonly delete: (key: string) => Effect.Effect<void>
 	}
 >() {}
 
-/**
- * Live implementation of RandomService
- */
-export const randomServiceLive: Layer.Layer<RandomService> = Layer.succeed(
-	RandomService,
-	{ next: Effect.sync(() => Math.random()) },
+// Exercise 3: Live layer backed by Ref<HashMap>
+export const keyValueStoreLive: Layer.Layer<KeyValueStore> = Layer.effect(
+	KeyValueStore,
+	Effect.gen(function* () {
+		const state = yield* Ref.make(HashMap.empty<string, string>())
+		return {
+			get: (key: string) =>
+				Ref.get(state).pipe(
+					Effect.map(HashMap.get(key)),
+					Effect.andThen(
+						Option.match({
+							onNone: () =>
+								Effect.fail(new KeyNotFoundError({ key })),
+							onSome: Effect.succeed,
+						}),
+					),
+				),
+			set: (key: string, value: string) =>
+				Ref.update(state, HashMap.set(key, value)),
+			delete: (key: string) =>
+				Ref.update(state, HashMap.remove(key)),
+		}
+	}),
 )
 
-/**
- * Program that uses RandomService to get a random number
- */
-export const programUsingRandom: Effect.Effect<
-	number,
-	never,
-	RandomService
-> = Effect.gen(function* () {
-	const random = yield* RandomService
-	return yield* random.next
-})
+// Exercise 4: Get or default
+export const getOrDefault = (
+	key: string,
+	defaultValue: string,
+): Effect.Effect<string, never, KeyValueStore> =>
+	Effect.gen(function* () {
+		const store = yield* KeyValueStore
+		return yield* store.get(key).pipe(
+			Effect.catchTag("KeyNotFoundError", () =>
+				Effect.succeed(defaultValue),
+			),
+		)
+	})
+
+// Exercise 5: Set and get
+export const setAndGet = (
+	key: string,
+	value: string,
+): Effect.Effect<string, KeyNotFoundError, KeyValueStore> =>
+	Effect.gen(function* () {
+		const store = yield* KeyValueStore
+		yield* store.set(key, value)
+		return yield* store.get(key)
+	})
