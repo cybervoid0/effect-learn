@@ -7,9 +7,9 @@ import { Context, Data, Effect, HashMap, Layer, Option, Ref } from "effect"
 // Define KeyNotFoundError — a tagged error with a `key: string` field
 // Hint: class ... extends Data.TaggedError("KeyNotFoundError")<{ ... }> {}
 
-export class KeyNotFoundError extends Data.TaggedError(
-	"KeyNotFoundError",
-)<{}> {} // <-- Fix this: add the `key` field
+export class KeyNotFoundError extends Data.TaggedError("KeyNotFoundError")<{
+	key: string
+}> {} // <-- Fix this: add the `key` field
 
 // ============================================================
 // Exercise 2: Define the KeyValueStore service tag
@@ -20,9 +20,15 @@ export class KeyNotFoundError extends Data.TaggedError(
 //   set:    (key: string, value: string) => Effect.Effect<void>
 //   delete: (key: string) => Effect.Effect<void>
 
+interface KeyValueStoreAPI {
+	get: (key: string) => Effect.Effect<string, KeyNotFoundError>
+	set: (key: string, value: string) => Effect.Effect<void>
+	delete: (key: string) => Effect.Effect<void>
+}
+
 export class KeyValueStore extends Context.Tag("KeyValueStore")<
 	KeyValueStore,
-	Record<string, never> // <-- Replace with the real interface
+	KeyValueStoreAPI
 >() {}
 
 // ============================================================
@@ -38,8 +44,25 @@ export class KeyValueStore extends Context.Tag("KeyValueStore")<
 // For `set`: update the HashMap with HashMap.set
 // For `delete`: update the HashMap with HashMap.remove
 
-export const keyValueStoreLive: Layer.Layer<KeyValueStore> =
-	Layer.succeed(KeyValueStore, {} as never) // <-- Replace with Layer.effect(...)
+export const keyValueStoreLive: Layer.Layer<KeyValueStore> = Layer.effect(
+	KeyValueStore,
+	Effect.gen(function* () {
+		const hm = yield* Ref.make(HashMap.empty<string, string>())
+		return {
+			get: (key) =>
+				Effect.gen(function* () {
+					const hash = yield* Ref.get(hm)
+					const val = HashMap.get(key)(hash)
+					return yield* Option.match(val, {
+						onSome: (a) => Effect.succeed(a),
+						onNone: () => Effect.fail(new KeyNotFoundError({ key })),
+					})
+				}),
+			set: (key, val) => Ref.update(hm, HashMap.set(key, val)),
+			delete: (key) => Ref.update(hm, HashMap.remove(key)),
+		}
+	}),
+) // <-- Replace with Layer.effect(...)
 
 // ============================================================
 // Exercise 4: Get a value or return a default
@@ -54,7 +77,13 @@ export const getOrDefault = (
 	defaultValue: string,
 ): Effect.Effect<string, never, KeyValueStore> => {
 	// Your code here
-	return Effect.succeed("TODO") as never
+	return Effect.gen(function* () {
+		const kvs = yield* KeyValueStore
+		return yield* kvs.get(key).pipe(
+			Effect.orElseSucceed(() => defaultValue),
+			//Effect.catchTag("KeyNotFoundError", () => Effect.succeed(defaultValue)),
+		)
+	})
 }
 
 // ============================================================
@@ -70,5 +99,9 @@ export const setAndGet = (
 	value: string,
 ): Effect.Effect<string, KeyNotFoundError, KeyValueStore> => {
 	// Your code here
-	return Effect.succeed("TODO") as never
+	return Effect.gen(function* () {
+		const kvp = yield* KeyValueStore
+		yield* kvp.set(key, value)
+		return yield* kvp.get(key)
+	})
 }

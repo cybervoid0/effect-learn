@@ -1,36 +1,35 @@
-import { Context, Data, Effect, Either } from "effect"
+import { Context, Data, Effect, type Either } from "effect"
 
 // ============================================================
 // Define types and services
 // ============================================================
 
 // TODO: Define User type (id: string, name: string)
+export interface User {
+	readonly id: string
+	readonly name: string
+}
 
 // TODO: Define UserNotFound tagged error with an `id` field
-
-// TODO: Define Logger service tag ("Logger") with:
-//   info:  (msg: string) => Effect.Effect<void>
-//   error: (msg: string) => Effect.Effect<void>
-
-// TODO: Define UserRepo service tag ("UserRepo") with:
-//   findById: (id: string) => Effect.Effect<User, UserNotFound>
-//   save:     (user: User) => Effect.Effect<void>
-
-// Placeholder exports — replace with real definitions
-export type User = { readonly id: string; readonly name: string }
-
 export class UserNotFound extends Data.TaggedError("UserNotFound")<{
-	readonly id: string
+	id: string
 }> {}
 
-export class Logger extends Context.Tag("Logger")<
-	Logger,
-	Record<string, never> // <-- Replace with real interface
->() {}
+// TODO: Define Logger service tag ("Logger") with:
+interface LoggerAPI {
+	info: (msg: string) => Effect.Effect<void>
+	error: (msg: string) => Effect.Effect<void>
+}
+export class Logger extends Context.Tag("Logger")<Logger, LoggerAPI>() {}
 
+// TODO: Define UserRepo service tag ("UserRepo") with:
+interface UserRepoAPI {
+	findById: (id: string) => Effect.Effect<User, UserNotFound>
+	save: (user: User) => Effect.Effect<void>
+}
 export class UserRepo extends Context.Tag("UserRepo")<
 	UserRepo,
-	Record<string, never> // <-- Replace with real interface
+	UserRepoAPI
 >() {}
 
 // ============================================================
@@ -43,7 +42,12 @@ export const loggedFind = (
 	id: string,
 ): Effect.Effect<User, UserNotFound, Logger | UserRepo> => {
 	// Your code here
-	return Effect.succeed({ id: "", name: "" }) as never
+	return Effect.gen(function* () {
+		const logger = yield* Logger
+		yield* logger.info(`looking up: ${id}`)
+		const { findById } = yield* UserRepo
+		return yield* findById(id)
+	})
 }
 
 // ============================================================
@@ -60,7 +64,20 @@ export const findOrCreate = (
 	name: string,
 ): Effect.Effect<User, never, Logger | UserRepo> => {
 	// Your code here
-	return Effect.succeed({ id: "", name: "" }) as never
+	return Effect.gen(function* () {
+		const { findById, save } = yield* UserRepo
+		const logger = yield* Logger
+		return yield* findById(id).pipe(
+			Effect.catchTag("UserNotFound", () =>
+				Effect.gen(function* () {
+					const newUser: User = { id, name }
+					yield* save(newUser)
+					yield* logger.info(`created: ${id}`)
+					return newUser
+				}),
+			),
+		)
+	})
 }
 
 // ============================================================
@@ -77,7 +94,15 @@ export const renameUser = (
 	newName: string,
 ): Effect.Effect<User, UserNotFound, Logger | UserRepo> => {
 	// Your code here
-	return Effect.succeed({ id: "", name: "" }) as never
+	return Effect.gen(function* () {
+		const { findById, save } = yield* UserRepo
+		const user = yield* findById(id)
+		const newUser: User = { ...user, name: newName }
+		yield* save(newUser)
+		const logger = yield* Logger
+		yield* logger.info(`renamed: ${user.id}`)
+		return newUser
+	})
 }
 
 // ============================================================
@@ -95,5 +120,10 @@ export const batchLookup = (
 	Logger | UserRepo
 > => {
 	// Your code here
-	return Effect.succeed([]) as never
+	return Effect.gen(function* () {
+		const logger = yield* Logger
+		yield* logger.info(`batch: ${ids.length} ids`)
+		const { findById } = yield* UserRepo
+		return yield* Effect.forEach(ids, (id) => Effect.either(findById(id)))
+	})
 }

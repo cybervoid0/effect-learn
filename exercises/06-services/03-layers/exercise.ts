@@ -5,28 +5,37 @@ import { Context, Effect, Layer } from "effect"
 // ============================================================
 
 // TODO: Define AppConfig service tag ("AppConfig") with:
-//   dbUrl:      string
-//   maxRetries: number
+
+interface AppConfigApi {
+	dbUrl: string
+	maxRetries: number
+}
 
 export class AppConfig extends Context.Tag("AppConfig")<
 	AppConfig,
-	Record<string, never> // <-- Replace with real interface
+	AppConfigApi
 >() {}
 
 // TODO: Define Database service tag ("Database") with:
 //   query: (sql: string) => Effect.Effect<string>
+interface DatabaseApi {
+	query: (sql: string) => Effect.Effect<string>
+}
 
 export class Database extends Context.Tag("Database")<
 	Database,
-	Record<string, never> // <-- Replace with real interface
+	DatabaseApi
 >() {}
 
 // TODO: Define UserService service tag ("UserService") with:
 //   getUser: (id: string) => Effect.Effect<string>
+interface UserServiceApi {
+	getUser: (id: string) => Effect.Effect<string>
+}
 
 export class UserService extends Context.Tag("UserService")<
 	UserService,
-	Record<string, never> // <-- Replace with real interface
+	UserServiceApi // <-- Replace with real interface
 >() {}
 
 // ============================================================
@@ -36,8 +45,10 @@ export class UserService extends Context.Tag("UserService")<
 // Create a Layer.succeed with:
 //   dbUrl: "postgres://localhost"
 //   maxRetries: 3
-export const configLayer: Layer.Layer<AppConfig> =
-	Layer.succeed(AppConfig, {} as never) // <-- Replace
+export const configLayer: Layer.Layer<AppConfig> = Layer.succeed(AppConfig, {
+	dbUrl: "postgres://localhost",
+	maxRetries: 3,
+}) // <-- Replace
 
 // ============================================================
 // Exercise 2: Database layer (depends on AppConfig)
@@ -48,7 +59,15 @@ export const configLayer: Layer.Layer<AppConfig> =
 // 2. Return implementation where query(sql) returns:
 //    Effect.succeed(`[${config.dbUrl}] result: ${sql}`)
 export const databaseLayer: Layer.Layer<Database, never, AppConfig> =
-	Layer.succeed(Database, {} as never) as never // <-- Replace with Layer.effect(...)
+	Layer.effect(
+		Database,
+		Effect.gen(function* () {
+			const { dbUrl } = yield* AppConfig
+			return { query: (sql) => Effect.succeed(`[${dbUrl}] result: ${sql}`) }
+		}),
+	)
+
+//const ConfiguredDatabase = Layer.provide(databaseLayer, configLayer)
 
 // ============================================================
 // Exercise 3: UserService layer (depends on Database)
@@ -58,19 +77,25 @@ export const databaseLayer: Layer.Layer<Database, never, AppConfig> =
 // 1. yield* Database to get db
 // 2. Return implementation where getUser(id) calls:
 //    db.query(`SELECT * FROM users WHERE id = '${id}'`)
-export const userServiceLayer: Layer.Layer<
-	UserService,
-	never,
-	Database
-> = Layer.succeed(UserService, {} as never) as never // <-- Replace with Layer.effect(...)
+export const userServiceLayer: Layer.Layer<UserService, never, Database> =
+	Layer.effect(UserService)(
+		Effect.gen(function* () {
+			const db = yield* Database
+			return {
+				getUser: (id) => db.query(`SELECT * FROM users WHERE id = '${id}'`),
+			}
+		}),
+	)
 
 // ============================================================
 // Exercise 4: Resolve database dependencies
 // ============================================================
 
 // Provide configLayer to databaseLayer to eliminate AppConfig requirement
-export const resolvedDatabaseLayer: Layer.Layer<Database> =
-	databaseLayer as never // <-- Replace with Layer.provide(...)
+export const resolvedDatabaseLayer: Layer.Layer<Database> = Layer.provide(
+	databaseLayer,
+	configLayer,
+)
 
 // ============================================================
 // Exercise 5: Full application layer
@@ -79,6 +104,9 @@ export const resolvedDatabaseLayer: Layer.Layer<Database> =
 // Compose everything into a single layer that provides
 // AppConfig, Database, AND UserService — with NO requirements.
 // Hint: you need to merge layers and resolve all dependencies
-export const fullAppLayer: Layer.Layer<
-	AppConfig | Database | UserService
-> = configLayer as never // <-- Replace with proper composition
+const ServiceWithDatabase = Layer.provide(
+	userServiceLayer,
+	resolvedDatabaseLayer,
+)
+export const fullAppLayer: Layer.Layer<AppConfig | Database | UserService> =
+	Layer.mergeAll(resolvedDatabaseLayer, ServiceWithDatabase, configLayer)
