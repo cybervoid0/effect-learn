@@ -2,7 +2,6 @@ import {
 	Context,
 	Data,
 	Effect,
-	Fiber,
 	HashMap,
 	Layer,
 	Option,
@@ -37,10 +36,16 @@ export class CacheMiss extends Data.TaggedError("CacheMiss")<{
 //   set:    (key: string, value: string) => Effect.Effect<void>
 //   remove: (key: string) => Effect.Effect<void>
 //   size:   Effect.Effect<number>
+interface TtlCacheApi {
+	get: (key: string) => Effect.Effect<string, CacheMiss>
+	set: (key: string, value: string) => Effect.Effect<void>
+	remove: (key: string) => Effect.Effect<void>
+	size: Effect.Effect<number>
+}
 
 export class TtlCache extends Context.Tag("TtlCache")<
 	TtlCache,
-	Record<string, never> // <-- Replace with real interface
+	TtlCacheApi
 >() {}
 
 // ============================================================
@@ -61,7 +66,43 @@ export class TtlCache extends Context.Tag("TtlCache")<
 export const ttlCacheLive = (
 	ttl: number,
 ): Layer.Layer<TtlCache, never, Scope.Scope> =>
-	Layer.succeed(TtlCache, {} as never) // <-- Replace with Layer.scoped(...)
+	Layer.scoped(TtlCache)(
+		Effect.gen(function* () {
+			const cache = yield* Ref.make(HashMap.empty<string, CacheEntry>())
+			yield* Effect.forkScoped(
+				Effect.forever(
+					Ref.update(
+						cache,
+						HashMap.filter((entry) => entry.expiresAt > Date.now()),
+					).pipe(Effect.delay(ttl / 2)),
+				),
+			)
+			return TtlCache.of({
+				get: (key) =>
+					Effect.gen(function* () {
+						const map = yield* Ref.get(cache)
+						return yield* Option.match(HashMap.get(map, key), {
+							onNone: () => Effect.fail(new CacheMiss({ key })),
+							onSome: (e) =>
+								e.expiresAt > Date.now()
+									? Effect.succeed(e.value)
+									: Effect.fail(new CacheMiss({ key })),
+						})
+					}),
+				set: (key, val) =>
+					Ref.update(
+						cache,
+						HashMap.set(key, { value: val, expiresAt: Date.now() + ttl }),
+					),
+				remove: (key) => Ref.update(cache, HashMap.remove(key)),
+				size: Effect.gen(function* () {
+					const map = yield* Ref.get(cache)
+					const now = Date.now()
+					return HashMap.countBy(map, ({ expiresAt }) => expiresAt > now)
+				}),
+			})
+		}),
+	)
 
 // ============================================================
 // Program 1: Get or compute
@@ -75,8 +116,19 @@ export const getOrSet = (
 	key: string,
 	compute: Effect.Effect<string>,
 ): Effect.Effect<string, never, TtlCache> => {
-	// Your code here
-	return Effect.succeed("TODO") as never
+	return Effect.gen(function* () {
+		const cache = yield* TtlCache
+		const val = cache.get(key)
+		return yield* val.pipe(
+			Effect.catchTag("CacheMiss", () =>
+				Effect.gen(function* () {
+					const val = yield* compute
+					yield* cache.set(key, val)
+					return val
+				}),
+			),
+		)
+	})
 }
 
 // ============================================================
@@ -92,5 +144,7 @@ export const cachedLookup = (
 	lookup: (key: string) => Effect.Effect<string>,
 ): Effect.Effect<Array<string>, never, TtlCache> => {
 	// Your code here
-	return Effect.succeed([]) as never
+	return Effect.forEach(keys, (key) => getOrSet(key, lookup(key)), {
+		concurrency: "unbounded",
+	})
 }
