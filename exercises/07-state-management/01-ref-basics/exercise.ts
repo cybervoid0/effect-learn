@@ -1,18 +1,25 @@
-import { Effect, Ref } from "effect"
+import { Effect as E, Ref } from "effect"
 
 /**
  * TODO: Create a Ref initialized to 0, then read and return the value.
  *
  * Hint: Use Ref.make to create, Ref.get to read.
  */
-export const createAndGet: Effect.Effect<number> = Effect.succeed(0) // Replace with correct implementation
+
+export const createAndGet: E.Effect<number> = Ref.make(0).pipe(
+	E.flatMap(Ref.get),
+)
 
 /**
  * TODO: Create a Ref initialized to 0, set it to 42, then read and return.
  *
  * Hint: Use Ref.make, Ref.set, and Ref.get.
  */
-export const setAndGet: Effect.Effect<number> = Effect.succeed(0) // Replace with correct implementation
+export const setAndGet: E.Effect<number> = E.gen(function* () {
+	const ref = yield* Ref.make(0)
+	yield* Ref.set(ref, 42)
+	return yield* Ref.get(ref)
+})
 
 /**
  * TODO: Create a Ref initialized to 10, use Ref.updateAndGet to add 5.
@@ -20,7 +27,10 @@ export const setAndGet: Effect.Effect<number> = Effect.succeed(0) // Replace wit
  *
  * Hint: Ref.updateAndGet applies a function and returns the new value.
  */
-export const updateRef: Effect.Effect<number> = Effect.succeed(0) // Replace with correct implementation
+export const updateRef: E.Effect<number> = E.gen(function* () {
+	const ref = yield* Ref.make(10)
+	return yield* Ref.updateAndGet(ref, val => val + 5)
+})
 
 /**
  * TODO: Create a Ref initialized to "hello".
@@ -28,7 +38,10 @@ export const updateRef: Effect.Effect<number> = Effect.succeed(0) // Replace wit
  *
  * Hint: Ref.modify takes a function that returns [returnValue, newState].
  */
-export const modifyRef: Effect.Effect<number> = Effect.succeed(0) // Replace with correct implementation
+
+export const modifyRef: E.Effect<number> = Ref.make("hello").pipe(
+	E.flatMap(Ref.modify(str => [str.length, str.toUpperCase()])),
+)
 
 /**
  * TODO: Create a Ref initialized to 0.
@@ -37,7 +50,12 @@ export const modifyRef: Effect.Effect<number> = Effect.succeed(0) // Replace wit
  *
  * Hint: Use Ref.update inside Effect.forEach, then Ref.get at the end.
  */
-export const counter = (n: number): Effect.Effect<number> => {
+export const counter = (n: number): E.Effect<number> => {
 	// Your code here
-	return Effect.succeed(0) // Replace with correct implementation
+	return E.gen(function* () {
+		const ref = yield* Ref.make(0)
+		const ran = Array.from({ length: n })
+		yield* E.forEach(ran, () => Ref.update(ref, b => b + 1))
+		return yield* Ref.get(ref)
+	})
 }
