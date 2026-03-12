@@ -1,4 +1,4 @@
-import { Effect, SynchronizedRef } from "effect"
+import { Effect, Fiber, SynchronizedRef } from "effect"
 
 /**
  * TODO: Create a SynchronizedRef initialized to "initial",
@@ -6,7 +6,9 @@ import { Effect, SynchronizedRef } from "effect"
  *
  * Hint: SynchronizedRef.make works like Ref.make, SynchronizedRef.get reads the value.
  */
-export const createSyncRef: Effect.Effect<string> = Effect.succeed("") // Replace with correct implementation
+export const createSyncRef: Effect.Effect<string> = SynchronizedRef.make(
+	"initial",
+).pipe(Effect.flatMap(SynchronizedRef.get))
 
 /**
  * TODO: Create a SynchronizedRef initialized to 0.
@@ -15,7 +17,12 @@ export const createSyncRef: Effect.Effect<string> = Effect.succeed("") // Replac
  *
  * Hint: updateEffect takes a function returning an Effect of the new value.
  */
-export const effectfulUpdate: Effect.Effect<number> = Effect.succeed(0) // Replace with correct implementation
+export const effectfulUpdate: Effect.Effect<number> = SynchronizedRef.make(
+	0,
+).pipe(
+	Effect.tap(SynchronizedRef.updateEffect(a => Effect.succeed(a + 10))),
+	Effect.flatMap(SynchronizedRef.get),
+)
 
 /**
  * TODO: Create a SynchronizedRef initialized to "hello".
@@ -24,7 +31,12 @@ export const effectfulUpdate: Effect.Effect<number> = Effect.succeed(0) // Repla
  *
  * Hint: modifyEffect takes a function returning Effect<[returnValue, newState]>.
  */
-export const effectfulModify: Effect.Effect<number> = Effect.succeed(0) // Replace with correct implementation
+export const effectfulModify: Effect.Effect<number> = Effect.gen(function* () {
+	const ref = yield* SynchronizedRef.make("hello")
+	return yield* SynchronizedRef.modifyEffect(ref, a =>
+		Effect.succeed([a.length, `${a} world`]),
+	)
+})
 
 /**
  * TODO: Given a SynchronizedRef<number>, use updateEffect to increment by 1.
@@ -34,10 +46,10 @@ export const effectfulModify: Effect.Effect<number> = Effect.succeed(0) // Repla
  */
 export const safeIncrement = (
 	ref: SynchronizedRef.SynchronizedRef<number>,
-): Effect.Effect<number> => {
-	// Your code here
-	return Effect.succeed(0) // Replace with correct implementation
-}
+): Effect.Effect<number> =>
+	SynchronizedRef.updateEffect(ref, a => Effect.succeed(a + 1)).pipe(
+		Effect.andThen(SynchronizedRef.get(ref)),
+	)
 
 /**
  * TODO: Create a SynchronizedRef initialized to 0.
@@ -46,4 +58,18 @@ export const safeIncrement = (
  *
  * Hint: Use Effect.fork + Fiber.join, or Effect.all with concurrency.
  */
-export const concurrentUpdates: Effect.Effect<number> = Effect.succeed(0) // Replace with correct implementation
+export const concurrentUpdates: Effect.Effect<number> = Effect.gen(
+	function* () {
+		const ref = yield* SynchronizedRef.make(0)
+		const fibers = yield* Effect.forEach(
+			Array.from({ length: 10 }),
+			() =>
+				Effect.fork(
+					SynchronizedRef.updateEffect(ref, a => Effect.succeed(a + 1)),
+				),
+			{ concurrency: "unbounded" },
+		)
+		yield* Effect.forEach(fibers, Fiber.join, { concurrency: "unbounded" })
+		return yield* SynchronizedRef.get(ref)
+	},
+)
