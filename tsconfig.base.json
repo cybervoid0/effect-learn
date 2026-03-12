@@ -12,7 +12,7 @@
     "exactOptionalPropertyTypes": true,
     "emitDecoratorMetadata": false,
     "experimentalDecorators": true,
-    "moduleResolution": "NodeNext",
+    "moduleResolution": "Bundler",
     "lib": ["ES2022", "DOM"],
     "isolatedModules": true,
     "sourceMap": true,
@@ -33,13 +33,13 @@
     "strictNullChecks": true,
     "baseUrl": ".",
     "target": "ES2022",
-    "module": "NodeNext",
+    "module": "ESNext",
     "incremental": true,
     "removeComments": false,
     "plugins": [{ "name": "@effect/language-service" }],
     "paths": {
-      "@template/cli": ["./src/index.js"],
-      "@template/cli/*": ["./src/*.js"]
+      "@template/cli": ["./src/index.ts"],
+      "@template/cli/*": ["./src/*.ts"]
     }
   }
 }
