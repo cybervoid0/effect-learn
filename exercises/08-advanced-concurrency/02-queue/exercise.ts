@@ -1,4 +1,4 @@
-import { Effect, Queue } from "effect"
+import { Array as A, Chunk, Effect as E, Fiber, Queue } from "effect"
 
 /**
  * TODO: Create a bounded queue with capacity 10.
@@ -6,7 +6,11 @@ import { Effect, Queue } from "effect"
  *
  * Hint: Queue.bounded<string>(10), Queue.offer, Queue.take.
  */
-export const offerAndTake: Effect.Effect<string> = Effect.succeed("") // Replace with correct implementation
+export const offerAndTake: E.Effect<string> = E.gen(function* () {
+	const q = yield* Queue.bounded<string>(10)
+	yield* Queue.offer(q, "hello")
+	return yield* Queue.take(q)
+})
 
 /**
  * TODO: Create an unbounded queue.
@@ -15,7 +19,12 @@ export const offerAndTake: Effect.Effect<string> = Effect.succeed("") // Replace
  *
  * Hint: Queue.unbounded<number>(), Queue.offer for each, Queue.takeAll, Chunk.toArray.
  */
-export const multipleItems: Effect.Effect<readonly number[]> = Effect.succeed([]) // Replace with correct implementation
+export const multipleItems: E.Effect<readonly number[]> =
+	Queue.unbounded<number>().pipe(
+		E.tap(Queue.offerAll([1, 2, 3])),
+		E.flatMap(Queue.takeAll),
+		E.map(Chunk.toArray),
+	)
 
 /**
  * TODO: Create a bounded queue with capacity 5.
@@ -24,7 +33,10 @@ export const multipleItems: Effect.Effect<readonly number[]> = Effect.succeed([]
  *
  * Hint: Queue.size returns Effect<number>.
  */
-export const queueSize: Effect.Effect<number> = Effect.succeed(0) // Replace with correct implementation
+export const queueSize: E.Effect<number> = Queue.bounded<string>(5).pipe(
+	E.tap(Queue.offerAll(["a", "b", "c"])),
+	E.flatMap(Queue.size),
+)
 
 /**
  * TODO: Create a bounded queue.
@@ -34,7 +46,24 @@ export const queueSize: Effect.Effect<number> = Effect.succeed(0) // Replace wit
  *
  * Hint: The consumer should take items one at a time in a loop.
  */
-export const producerConsumer: Effect.Effect<number> = Effect.succeed(0) // Replace with correct implementation
+export const producerConsumer: E.Effect<number> = Queue.bounded<number>(5).pipe(
+	E.tap(q => E.fork(Queue.offerAll(q, A.range(1, 5)))),
+	E.andThen(q =>
+		E.fork(
+			E.iterate(
+				{ count: 0, sum: 0 },
+				{
+					while: ({ count }) => count < 5,
+					body: ({ count, sum }) =>
+						Queue.take(q).pipe(
+							E.andThen(n => ({ count: count + 1, sum: sum + n })),
+						),
+				},
+			).pipe(E.map(({ sum }) => sum)),
+		),
+	),
+	E.andThen(Fiber.join),
+)
 
 /**
  * TODO: Create a bounded queue with capacity 2.
@@ -45,4 +74,13 @@ export const producerConsumer: Effect.Effect<number> = Effect.succeed(0) // Repl
  *
  * Hint: The 3rd offer blocks until you take from the queue.
  */
-export const boundedBackpressure: Effect.Effect<readonly [number, number, number]> = Effect.succeed([0, 0, 0] as const) // Replace with correct implementation
+export const boundedBackpressure: E.Effect<readonly [number, number, number]> =
+	E.gen(function* () {
+		const q = yield* Queue.bounded<number>(2)
+		yield* Queue.offerAll(q, [1, 2])
+		yield* E.fork(Queue.offer(q, 3))
+		//yield* Queue.offer(q, 3)
+		const [item1, item2] = yield* Queue.takeAll(q)
+		const item3 = yield* Queue.take(q)
+		return [item1, item2, item3]
+	})
