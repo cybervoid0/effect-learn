@@ -1,4 +1,4 @@
-import { Effect, PubSub, Queue } from "effect"
+import { Array as A, Chunk, Effect, Number as N, PubSub, Queue } from "effect"
 
 /**
  * TODO: Create a bounded PubSub<string> with capacity 10.
@@ -8,7 +8,15 @@ import { Effect, PubSub, Queue } from "effect"
  * Hint: PubSub.subscribe is scoped — wrap everything in Effect.scoped.
  * Subscribe BEFORE publishing, otherwise the message is lost.
  */
-export const publishAndReceive: Effect.Effect<string> = Effect.succeed("") // Replace with correct implementation
+const capacity = 10
+export const publishAndReceive: Effect.Effect<string> = Effect.scoped(
+	Effect.gen(function* () {
+		const pubSub = yield* PubSub.bounded<string>(capacity)
+		const queue = yield* PubSub.subscribe(pubSub)
+		yield* PubSub.publish(pubSub, "hello")
+		return yield* Queue.take(queue)
+	}),
+)
 
 /**
  * TODO: Create a bounded PubSub<string> with capacity 10.
@@ -19,7 +27,17 @@ export const publishAndReceive: Effect.Effect<string> = Effect.succeed("") // Re
  * Hint: Both subscriptions must be active before publishing.
  */
 export const multipleSubscribers: Effect.Effect<readonly [string, string]> =
-	Effect.succeed(["", ""] as const) // Replace with correct implementation
+	Effect.scoped(
+		Effect.gen(function* () {
+			const pubSub = yield* PubSub.bounded<string>(capacity)
+			const subscriber1 = yield* PubSub.subscribe(pubSub)
+			const subscriber2 = yield* PubSub.subscribe(pubSub)
+			yield* PubSub.publish(pubSub, "msg")
+			const subMsg1 = yield* Queue.take(subscriber1)
+			const subMsg2 = yield* Queue.take(subscriber2)
+			return [subMsg1, subMsg2]
+		}),
+	)
 
 /**
  * TODO: Create a bounded PubSub<number> with capacity 10.
@@ -29,7 +47,15 @@ export const multipleSubscribers: Effect.Effect<readonly [string, string]> =
  *
  * Hint: Use Queue.take for each item, or a loop.
  */
-export const publishMany: Effect.Effect<readonly number[]> = Effect.succeed([]) // Replace with correct implementation
+export const publishMany: Effect.Effect<readonly number[]> = Effect.scoped(
+	Effect.gen(function* () {
+		const pubSub = yield* PubSub.bounded<number>(capacity)
+		const subscriber1 = yield* PubSub.subscribe(pubSub)
+		const range = A.range(1, 3)
+		yield* Effect.forEach(range, n => PubSub.publish(pubSub, n))
+		return yield* Effect.forEach(range, () => Queue.take(subscriber1))
+	}),
+)
 
 /**
  * TODO: Create a bounded PubSub<string> with capacity 10.
@@ -40,7 +66,17 @@ export const publishMany: Effect.Effect<readonly number[]> = Effect.succeed([]) 
  *
  * Hint: Collect messages from all subscribers, then count.
  */
-export const fanOut: Effect.Effect<number> = Effect.succeed(0) // Replace with correct implementation
+export const fanOut: Effect.Effect<number> = Effect.scoped(
+	Effect.gen(function* () {
+		const pubSub = yield* PubSub.bounded<string>(capacity)
+		const subscribers = yield* Effect.forEach(A.range(1, 3), () =>
+			PubSub.subscribe(pubSub),
+		)
+		yield* PubSub.publish(pubSub, "broadcast")
+		const chunks = yield* Effect.forEach(subscribers, Queue.takeAll)
+		return chunks.reduce((acc, ch) => acc + Chunk.size(ch), 0)
+	}),
+)
 
 /**
  * TODO: Create a bounded PubSub<number> with capacity 10.
@@ -51,4 +87,13 @@ export const fanOut: Effect.Effect<number> = Effect.succeed(0) // Replace with c
  * Hint: Subscribe BEFORE forking the publisher to avoid losing messages.
  * The consumer should take items in a loop (or use Effect.forEach).
  */
-export const pubsubWithProcessing: Effect.Effect<number> = Effect.succeed(0) // Replace with correct implementation
+export const pubsubWithProcessing: Effect.Effect<number> = Effect.scoped(
+	Effect.gen(function* () {
+		const pubSub = yield* PubSub.bounded<number>(capacity)
+		const queue = yield* PubSub.subscribe(pubSub)
+		yield* Effect.fork(PubSub.publishAll(pubSub, A.range(1, 5)))
+		return yield* Effect.forEach(A.range(1, 5), () => Queue.take(queue), {
+			concurrency: "unbounded",
+		}).pipe(Effect.map(N.sumAll))
+	}),
+)

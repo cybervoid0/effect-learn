@@ -1,4 +1,4 @@
-import { Effect, Ref } from "effect"
+import { Array as A, Effect, Ref } from "effect"
 
 /**
  * TODO: Create a semaphore with 1 permit.
@@ -7,7 +7,10 @@ import { Effect, Ref } from "effect"
  *
  * Hint: Effect.makeSemaphore(n), sem.withPermits(n)(effect).
  */
-export const basicPermit: Effect.Effect<number> = Effect.succeed(0) // Replace with correct implementation
+export const basicPermit: Effect.Effect<number> = Effect.gen(function* () {
+	const mutex = yield* Effect.makeSemaphore(1)
+	return yield* mutex.withPermits(1)(Effect.succeed(42))
+})
 
 /**
  * TODO: Create a semaphore with 2 permits.
@@ -21,7 +24,27 @@ export const basicPermit: Effect.Effect<number> = Effect.succeed(0) // Replace w
  *
  * Hint: Use Effect.forEach with { concurrency: "unbounded" }.
  */
-export const limitConcurrency: Effect.Effect<number> = Effect.succeed(0) // Replace with correct implementation
+export const limitConcurrency: Effect.Effect<number> = Effect.gen(function* () {
+	const current = yield* Ref.make(0)
+	const max = yield* Ref.make(0)
+	const sem2 = yield* Effect.makeSemaphore(2)
+	yield* Effect.forEach(
+		A.range(1, 5),
+		() =>
+			sem2.withPermits(1)(
+				Effect.gen(function* () {
+					const incrCurr = yield* Ref.updateAndGet(current, n => n + 1)
+					yield* Ref.update(max, n => Math.max(n, incrCurr))
+					yield* Effect.sleep("10 millis")
+					yield* Ref.update(current, n => n - 1)
+				}),
+			),
+		{
+			concurrency: "unbounded",
+		},
+	)
+	return yield* Ref.get(max)
+})
 
 /**
  * TODO: Create a semaphore with 1 permit (mutex).
@@ -35,7 +58,23 @@ export const limitConcurrency: Effect.Effect<number> = Effect.succeed(0) // Repl
  *
  * Without the semaphore, concurrent read-yield-write would lose updates.
  */
-export const mutualExclusion: Effect.Effect<number> = Effect.succeed(0) // Replace with correct implementation
+export const mutualExclusion: Effect.Effect<number> = Effect.gen(function* () {
+	const mutex = yield* Effect.makeSemaphore(1)
+	const ref = yield* Ref.make<number>(0)
+	yield* Effect.forEach(
+		A.range(1, 10),
+		() =>
+			mutex.withPermits(1)(
+				Effect.gen(function* () {
+					const curr = yield* Ref.get(ref)
+					yield* Effect.yieldNow()
+					yield* Ref.set(ref, curr + 1)
+				}),
+			),
+		{ concurrency: "unbounded" },
+	)
+	return yield* Ref.get(ref)
+})
 
 /**
  * TODO: Create a semaphore with 3 permits (simulating a connection pool).
@@ -47,4 +86,22 @@ export const mutualExclusion: Effect.Effect<number> = Effect.succeed(0) // Repla
  * All tasks must go through sem.withPermits(1).
  * Return the max concurrent count (should be ≤ 3).
  */
-export const connectionPool: Effect.Effect<number> = Effect.succeed(0) // Replace with correct implementation
+export const connectionPool: Effect.Effect<number> = Effect.gen(function* () {
+	const current = yield* Ref.make(0)
+	const max = yield* Ref.make(0)
+	const sem = yield* Effect.makeSemaphore(3)
+	yield* Effect.forEach(
+		A.range(1, 10),
+		() =>
+			sem.withPermits(1)(
+				Effect.gen(function* () {
+					const curr = yield* Ref.updateAndGet(current, x => x + 1)
+					yield* Ref.update(max, x => Math.max(curr, x))
+					yield* Effect.sleep("5 millis")
+					yield* Ref.update(current, x => x - 1)
+				}),
+			),
+		{ concurrency: "unbounded" },
+	)
+	return yield* Ref.get(max)
+})
