@@ -35,14 +35,13 @@ export const streamWithRetry = (): Effect.Effect<readonly string[]> => {
 		const stream = Stream.fromEffect(
 			Ref.getAndUpdate(attempts, (n) => n + 1).pipe(
 				Effect.flatMap((n) =>
-					n === 0
-						? Effect.fail("retry" as const)
-						: Effect.succeed("success"),
+					n === 0 ? Effect.fail("retry" as const) : Effect.succeed("success"),
 				),
 			),
 		)
 		const chunk = yield* stream.pipe(
 			Stream.retry(Schedule.once),
+			Stream.orDie,
 			Stream.runCollect,
 		)
 		return Chunk.toReadonlyArray(chunk)
@@ -70,9 +69,7 @@ export const streamEither = (): Effect.Effect<readonly string[]> => {
 	return Effect.gen(function* () {
 		const chunk = yield* Stream.make(2, 3, 4).pipe(
 			Stream.mapEffect((n) =>
-				n % 2 === 0
-					? Effect.succeed(n)
-					: Effect.fail("odd" as const),
+				n % 2 === 0 ? Effect.succeed(n) : Effect.fail("odd" as const),
 			),
 			Stream.either,
 			Stream.map(
