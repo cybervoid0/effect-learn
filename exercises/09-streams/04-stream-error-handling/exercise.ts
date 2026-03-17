@@ -1,4 +1,4 @@
-import { Chunk, Effect, Either, Ref, Schedule, Stream } from "effect"
+import { Chunk, Effect, Either, pipe, Ref, Schedule, Stream } from "effect"
 
 /**
  * TODO: Create a stream that fails with "error", then use
@@ -6,10 +6,13 @@ import { Chunk, Effect, Either, Ref, Schedule, Stream } from "effect"
  * Collect and return as a readonly array.
  * Expected: ["recovered"]
  */
-export const streamCatchAll = (): Effect.Effect<readonly string[]> => {
-	// Your code here
-	return Effect.succeed([]) // Replace with correct implementation
-}
+export const streamCatchAll = (): Effect.Effect<readonly string[]> =>
+	pipe(
+		Stream.fail("error"),
+		Stream.catchAll(() => Stream.make("recovered")),
+		Stream.runCollect,
+		Effect.map(Chunk.toReadonlyArray),
+	)
 
 /**
  * TODO: Create a stream that fails with "err", then use
@@ -17,10 +20,13 @@ export const streamCatchAll = (): Effect.Effect<readonly string[]> => {
  * Collect and return as a readonly array.
  * Expected: ["fallback"]
  */
-export const streamOrElse = (): Effect.Effect<readonly string[]> => {
-	// Your code here
-	return Effect.succeed([]) // Replace with correct implementation
-}
+export const streamOrElse = (): Effect.Effect<readonly string[]> =>
+	pipe(
+		Stream.fail("error"),
+		Stream.orElse(() => Stream.make("fallback")),
+		Stream.runCollect,
+		Effect.map(Chunk.toReadonlyArray),
+	)
 
 /**
  * TODO: Use a Ref to track the number of attempts.
@@ -32,10 +38,27 @@ export const streamOrElse = (): Effect.Effect<readonly string[]> => {
  * Collect and return as a readonly array.
  * Expected: ["success"]
  */
-export const streamWithRetry = (): Effect.Effect<readonly string[]> => {
-	// Your code here
-	return Effect.succeed([]) // Replace with correct implementation
-}
+export const streamWithRetry = (): Effect.Effect<readonly string[]> =>
+	pipe(
+		Ref.make<number>(0),
+		Effect.andThen(ref =>
+			pipe(
+				Stream.fromEffect(
+					Ref.getAndUpdate(ref, n => n + 1).pipe(
+						Effect.andThen(n =>
+							n === 0
+								? Effect.fail("retry" as const)
+								: Effect.succeed("success"),
+						),
+					),
+				),
+				Stream.retry(Schedule.once),
+				Stream.orDie,
+				Stream.runCollect,
+				Effect.andThen(Chunk.toReadonlyArray),
+			),
+		),
+	)
 
 /**
  * TODO: Create a stream that emits 1, 2, then fails with "oops".
@@ -45,7 +68,13 @@ export const streamWithRetry = (): Effect.Effect<readonly string[]> => {
  */
 export const partialStream = (): Effect.Effect<readonly number[]> => {
 	// Your code here
-	return Effect.succeed([]) // Replace with correct implementation
+	return pipe(
+		Stream.make(1, 2),
+		Stream.concat(Stream.fail("oops" as const)),
+		Stream.catchAll(() => Stream.make(0)),
+		Stream.runCollect,
+		Effect.andThen(Chunk.toReadonlyArray),
+	)
 }
 
 /**
@@ -57,7 +86,20 @@ export const partialStream = (): Effect.Effect<readonly number[]> => {
  * Collect and return as a readonly array.
  * Expected: ["right:2", "left:odd", "right:4"]
  */
-export const streamEither = (): Effect.Effect<readonly string[]> => {
-	// Your code here
-	return Effect.succeed([]) // Replace with correct implementation
-}
+export const streamEither = (): Effect.Effect<readonly string[]> =>
+	pipe(
+		Stream.fromIterable([2, 3, 4]),
+		Stream.mapEffect(n =>
+			(n % 2 === 0 ? Effect.succeed(n) : Effect.fail("odd")).pipe(
+				Effect.either,
+			),
+		),
+		Stream.map(
+			Either.match({
+				onLeft: err => `left:${err}`,
+				onRight: n => `right:${n}`,
+			}),
+		),
+		Stream.runCollect,
+		Effect.andThen(Chunk.toReadonlyArray),
+	)
