@@ -14,13 +14,14 @@ Complete list of exercises for learning Effect from basic concepts to advanced p
 
 Mark completed exercises:
 
-## Level 1: Basics (3 exercises)
+## Level 1: Basics (4 exercises)
 
-Learn the fundamentals of creating, running, and transforming Effects.
+Learn the fundamentals of creating, running, transforming Effects, and Algebraic Data Types.
 
 - [ ] **01-creating-effects** - Creating Effects with succeed, fail, sync, promise
 - [ ] **02-running-effects** - Running Effects with runSync, runPromise, runFork
 - [ ] **03-transforming-effects** - Transforming Effects with map, flatMap, andThen
+- [ ] **04-algebraic-data-types** - ADTs via Data.struct, Data.TaggedClass, Data.taggedEnum
 
 ## Level 2: Error Handling (3 exercises)
 
@@ -135,7 +136,7 @@ Advanced Effect usage patterns.
 
 ---
 
-**Total: 47 exercises**
+**Total: 48 exercises**
 
 ## Additional Resources
 
